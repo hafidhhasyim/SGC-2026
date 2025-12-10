@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { EventData, Category, JuknisItem, FaqItem, DataContextType, ContactInfo, SocialLinks } from '../types';
+import { EventData, Category, JuknisItem, FaqItem, DataContextType, ContactInfo, SocialLinks, RegistrationFormData } from '../types';
 
 const STORAGE_KEY = 'SGC_APP_DATA_V3'; // Bumped version for cleanup
 
@@ -240,6 +240,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const updateContactInfo = (info: ContactInfo) => setContactInfo(info);
     const updateSocialLinks = (links: SocialLinks) => setSocialLinks(links);
 
+    // Mock Registration
+    const registerParticipant = (data: RegistrationFormData) => {
+        console.log("Registered Participant:", data);
+        // In a real app, this would send data to a backend or Google Sheet
+    };
+
     return (
         <DataContext.Provider value={{ 
             events, juknisList, faqs,
@@ -251,6 +257,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             updateFaq, addFaq, deleteFaq,
             updateRegistrationUrl, updatePublicParticipantsUrl, updateBrochureUrl, updateLogoUrl, updateBannerUrl,
             updateAdminPassword, updateContactInfo, updateSocialLinks,
+            
+            registerParticipant,
             resetData
         }}>
             {children}

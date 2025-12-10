@@ -43,6 +43,23 @@ export interface SocialLinks {
     facebook: string;
 }
 
+export interface RegistrationFormData {
+  fullName: string;
+  schoolOrigin: string;
+  grade: string;
+  parentName: string;
+  whatsappNumber: string;
+  selectedEvent: string;
+  paymentProof: File | null;
+}
+
+export interface ChatMessage {
+    id: string;
+    role: 'user' | 'assistant' | 'model';
+    text: string;
+    isError?: boolean;
+}
+
 export interface DataContextType {
     events: EventData[];
     juknisList: JuknisItem[];
@@ -82,6 +99,9 @@ export interface DataContextType {
     updateAdminPassword: (password: string) => void;
     updateContactInfo: (info: ContactInfo) => void;
     updateSocialLinks: (links: SocialLinks) => void;
+
+    // Registration
+    registerParticipant: (data: RegistrationFormData) => void;
 
     resetData: () => void;
 }

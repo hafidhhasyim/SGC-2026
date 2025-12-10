@@ -88,7 +88,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-3 text-sm text-slate-400">
               <li><Link to="/participants" className="hover:text-primary-400 transition-colors">Daftar Peserta</Link></li>
               <li><Link to="/juknis" className="hover:text-primary-400 transition-colors">Download Juknis</Link></li>
-              <li><Link to="/check-status" className="hover:text-primary-400 transition-colors">Cek Status Pendaftaran</Link></li>
+              <li><Link to="/faq" className="hover:text-primary-400 transition-colors">Pertanyaan Umum (FAQ)</Link></li>
               <li><a href="#" onClick={preventDefault} className="hover:text-primary-400 transition-colors">Galeri Kegiatan</a></li>
             </ul>
           </div>

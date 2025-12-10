@@ -10,7 +10,6 @@ import Categories from './pages/Categories';
 import JuknisPage from './pages/JuknisPage';
 import FaqPage from './pages/FaqPage';
 import AdminDashboard from './pages/AdminDashboard';
-import CheckStatusPage from './pages/CheckStatusPage';
 import ParticipantListPage from './pages/ParticipantListPage';
 
 // Layout Component to conditionally render Navbar/Footer
@@ -53,7 +52,6 @@ const AppRoutes: React.FC = () => {
             <Route path="/participants" element={<Layout><ParticipantListPage /></Layout>} />
             <Route path="/juknis" element={<Layout><JuknisPage /></Layout>} />
             <Route path="/faq" element={<Layout><FaqPage /></Layout>} />
-            <Route path="/check-status" element={<Layout><CheckStatusPage /></Layout>} />
             <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
     );
