@@ -29,45 +29,60 @@ export const tursoService = {
     const baseUrl = getBaseUrl(dbUrl);
     const url = `${baseUrl}/v2/pipeline`;
     
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                requests: [
-                { type: "execute", stmt: { sql, args } },
-                { type: "close" }
-                ]
-            }),
-            credentials: 'omit', // Important: Do not send cookies
-            mode: 'cors',        // Explicitly request CORS
-            keepalive: true,     // Help request survive page lifecycle events
-            cache: 'no-store'
-        });
+    // Simple retry logic to handle cold starts or transient network blips
+    const maxRetries = 2;
+    let lastError;
 
-        if (!response.ok) {
-            const text = await response.text();
-            throw new Error(`Turso API HTTP Error: ${response.status} - ${text}`);
-        }
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    requests: [
+                        { type: "execute", stmt: { sql, args } },
+                        { type: "close" }
+                    ]
+                }),
+                credentials: 'omit' // Do not send cookies
+            });
 
-        const json = await response.json() as TursoResponse;
-        
-        // Check for application level errors in the response
-        if (json.error) {
-            throw new Error(`Turso API Error: ${json.error.message}`);
-        }
-        if (json.results && json.results[0] && json.results[0].error) {
-            throw new Error(`SQL Error: ${json.results[0].error.message}`);
-        }
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Turso API HTTP Error: ${response.status} - ${text}`);
+            }
 
-        return json;
-    } catch (error) {
-        // Let the caller handle the error logging to avoid noise
-        throw error;
+            const json = await response.json() as TursoResponse;
+            
+            // Check for application level errors in the response
+            if (json.error) {
+                throw new Error(`Turso API Error: ${json.error.message}`);
+            }
+            if (json.results && json.results[0] && json.results[0].error) {
+                throw new Error(`SQL Error: ${json.results[0].error.message}`);
+            }
+
+            return json;
+        } catch (error: any) {
+            lastError = error;
+            const isNetworkError = error.name === 'TypeError' || error.message.includes('NetworkError') || error.message.includes('Failed to fetch');
+            
+            // If it's a network error (potential cold start), wait and retry
+            if (isNetworkError && attempt < maxRetries) {
+                console.log(`Turso request failed (Attempt ${attempt + 1}/${maxRetries + 1}). Retrying in 1s...`);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                continue;
+            }
+            
+            // For other errors (Auth, SQL syntax), fail immediately
+            break;
+        }
     }
+    
+    throw lastError;
   },
 
   async initTable(dbUrl: string, authToken: string) {
@@ -117,8 +132,9 @@ export const tursoService = {
          }
 
          // Handle Network Errors gracefully
-         if (msg.includes("NetworkError") || msg.includes("Failed to fetch")) {
-             console.warn("Turso connection issue (Offline or Blocked):", msg);
+         if (msg.includes("NetworkError") || msg.includes("Failed to fetch") || msg.includes("TypeError")) {
+             console.warn("Turso connection issue (Offline, Blocked, or Sleeping DB):", msg);
+             // Do not throw, just return null so app uses local storage
              return null;
          }
 

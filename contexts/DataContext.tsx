@@ -106,13 +106,13 @@ const INITIAL_FAQS: FaqItem[] = [
     }
 ];
 
-const INITIAL_REGISTRATION_URL = '#';
-const INITIAL_PUBLIC_PARTICIPANTS_URL = '';
-const INITIAL_BROCHURE_URL = '#';
-const INITIAL_LOGO_URL = '';
+const INITIAL_REGISTRATION_URL = 'https://forms.gle/sykYzkquxY6DBwLS6';
+const INITIAL_PUBLIC_PARTICIPANTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTnCzLsaBbh2F5_x0_s7i9m5wNcKwZvsEKcd09iP55k6UbMChdxg9ZhNCKvSuyOYruA08WHE-j-_zrA/pubhtml?gid=20648520&single=true';
+const INITIAL_BROCHURE_URL = 'https://drive.google.com/file/d/1Y6bQrXLwRZpWAiUoFA4gfJ-x-qMw9ug5/view?usp=sharing';
+const INITIAL_LOGO_URL = 'https://drive.google.com/file/d/1SnT37ISkjfMT9Nff0WJK3y_O1D40HRFI/view?usp=sharing';
 const INITIAL_BANNER_URL = 'https://drive.google.com/thumbnail?id=1wAHp_r0aMa743kUnzGN0uAVApl5RHmJh&sz=w1920&v=2'; 
-const INITIAL_JUKNIS_URL = '';
-const INITIAL_ADMIN_PASSWORD = 'admin123';
+const INITIAL_JUKNIS_URL = 'https://drive.google.com/file/d/1sfm9IZ8sddmHggeykXDhSEhorDMkeORO/view?usp=sharing';
+const INITIAL_ADMIN_PASSWORD = 'spensa123';
 
 const INITIAL_CONTACT_INFO: ContactInfo = {
     address: 'Jl. Bromo No. 49 Genteng - Banyuwangi',

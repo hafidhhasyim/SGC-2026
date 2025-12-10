@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, ReactNode, useEffect } from
 import { EventData, Category, JuknisItem, FaqItem, DataContextType, ContactInfo, SocialLinks, RegistrationFormData, TursoConfig } from '../types';
 import { tursoService } from '../services/tursoService';
 
-const STORAGE_KEY = 'SGC_APP_DATA_V5'; // Bumped version for Turso
+const STORAGE_KEY = 'SGC_APP_DATA_V6'; // Bumped version for New Assets
 
 // Initial Mock Data updated for SGC 2026
 const INITIAL_EVENTS: EventData[] = [
@@ -73,7 +73,7 @@ const INITIAL_JUKNIS: JuknisItem[] = [
         id: '1',
         title: 'Buku Panduan SGC 2026',
         description: 'Panduan lengkap seluruh cabang lomba, tata tertib, dan teknis pelaksanaan SGC 2026.',
-        downloadUrl: '#'
+        downloadUrl: 'https://drive.google.com/file/d/1sfm9IZ8sddmHggeykXDhSEhorDMkeORO/view?usp=sharing'
     },
     {
         id: '2',
@@ -106,12 +106,12 @@ const INITIAL_FAQS: FaqItem[] = [
     }
 ];
 
-const INITIAL_REGISTRATION_URL = '#';
-const INITIAL_PUBLIC_PARTICIPANTS_URL = '';
-const INITIAL_BROCHURE_URL = '#';
-const INITIAL_LOGO_URL = '';
-const INITIAL_BANNER_URL = 'https://drive.google.com/thumbnail?id=1wAHp_r0aMa743kUnzGN0uAVApl5RHmJh&sz=w1920&v=2'; 
-const INITIAL_JUKNIS_URL = '';
+const INITIAL_REGISTRATION_URL = 'https://forms.gle/sykYzkquxY6DBwLS6';
+const INITIAL_PUBLIC_PARTICIPANTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTnCzLsaBbh2F5_x0_s7i9m5wNcKwZvsEKcd09iP55k6UbMChdxg9ZhNCKvSuyOYruA08WHE-j-_zrA/pubhtml?gid=20648520&single=true';
+const INITIAL_BROCHURE_URL = 'https://drive.google.com/file/d/1Y6bQrXLwRZpWAiUoFA4gfJ-x-qMw9ug5/view?usp=sharing';
+const INITIAL_LOGO_URL = 'https://drive.google.com/file/d/1SnT37ISkjfMT9Nff0WJK3y_O1D40HRFI/view?usp=sharing';
+const INITIAL_BANNER_URL = 'https://drive.google.com/file/d/1wAHp_r0aMa743kUnzGN0uAVApl5RHmJh/view?usp=sharing'; 
+const INITIAL_JUKNIS_URL = 'https://drive.google.com/file/d/1sfm9IZ8sddmHggeykXDhSEhorDMkeORO/view?usp=sharing';
 const INITIAL_ADMIN_PASSWORD = 'admin123';
 
 const INITIAL_CONTACT_INFO: ContactInfo = {
