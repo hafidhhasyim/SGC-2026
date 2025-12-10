@@ -53,13 +53,6 @@ export interface RegistrationFormData {
   paymentProof: File | null;
 }
 
-export interface ChatMessage {
-    id: string;
-    role: 'user' | 'assistant' | 'model';
-    text: string;
-    isError?: boolean;
-}
-
 export interface DataContextType {
     events: EventData[];
     juknisList: JuknisItem[];
