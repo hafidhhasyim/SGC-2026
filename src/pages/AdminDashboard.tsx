@@ -195,9 +195,25 @@ const AdminDashboard: React.FC = () => {
             setNewPassword(''); // Clear after save
         }
         
+        // Prepare new settings object to pass directly to sync
+        // This avoids race condition where state hasn't updated yet in the context
+        const newSettingsOverride = {
+            registrationUrl: urlInput,
+            publicParticipantsUrl: sheetUrlInput,
+            brochureUrl: brochureUrlInput,
+            logoUrl: logoUrlInput,
+            bannerUrl: bannerUrlInput,
+            juknisUrl: juknisUrlInput,
+            contactInfo: contactForm,
+            socialLinks: socialForm,
+            tursoConfig: tursoForm,
+            // Only update password in payload if it was actually changed
+            adminPassword: newPassword.trim() !== '' ? newPassword : adminPassword
+        };
+
         // Attempt to sync to Turso immediately
         if (tursoForm.enabled) {
-            const success = await syncToTurso();
+            const success = await syncToTurso(newSettingsOverride);
             if (success) {
                 alert('Pengaturan berhasil diperbarui dan disinkronkan ke Database Turso!');
             } else {

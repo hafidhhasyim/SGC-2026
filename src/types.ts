@@ -107,6 +107,6 @@ export interface DataContextType {
     registerParticipant: (data: RegistrationFormData) => void;
 
     resetData: () => void;
-    syncToTurso: () => Promise<boolean>; // Manual sync action
+    syncToTurso: (overrideData?: any) => Promise<boolean>; // Manual sync action with optional override
     isSyncing: boolean;
 }

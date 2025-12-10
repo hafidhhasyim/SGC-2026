@@ -213,9 +213,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         fetchRemoteData();
     }, []); // Empty dependency array to run only on mount
 
-    // Manual Sync function
-    const syncToTurso = async (): Promise<boolean> => {
-        if (!tursoConfig.enabled || !tursoConfig.dbUrl || !tursoConfig.authToken) {
+    // Manual Sync function with optional override
+    const syncToTurso = async (overrideData?: any): Promise<boolean> => {
+        // Use override config if provided (for example, before state updates), otherwise use current state
+        const config = overrideData?.tursoConfig || tursoConfig;
+
+        if (!config.enabled || !config.dbUrl || !config.authToken) {
             return false;
         }
 
@@ -224,9 +227,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const currentState = { 
                 events, juknisList, faqs, 
                 registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl,
-                adminPassword, contactInfo, socialLinks, tursoConfig
+                adminPassword, contactInfo, socialLinks, tursoConfig,
+                ...overrideData // Apply overrides
             };
-            await tursoService.saveData(tursoConfig.dbUrl, tursoConfig.authToken, JSON.stringify(currentState));
+            await tursoService.saveData(config.dbUrl, config.authToken, JSON.stringify(currentState));
             setIsSyncing(false);
             return true;
         } catch (error) {
