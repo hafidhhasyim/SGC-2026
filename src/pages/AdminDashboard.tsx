@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 const AdminDashboard: React.FC = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [passwordInput, setPasswordInput] = useState('');
-    const [activeTab, setActiveTab] = useState<'events' | 'juknis' | 'faq' | 'database' | 'settings'>('events');
+    const [activeTab, setActiveTab] = useState<'events' | 'juknis' | 'database' | 'faq' | 'settings'>('events');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const navigate = useNavigate();
     
@@ -284,16 +284,16 @@ const AdminDashboard: React.FC = () => {
                         <FileText size={20} /> Juknis
                     </button>
                     <button 
-                        onClick={() => handleNavClick('faq')}
-                        className={`w-full flex items-center gap-3 px-6 py-4 text-left ${activeTab === 'faq' ? 'bg-primary-600' : 'hover:bg-slate-800'}`}
-                    >
-                        <HelpCircle size={20} /> FAQ
-                    </button>
-                    <button 
                         onClick={() => handleNavClick('database')}
                         className={`w-full flex items-center gap-3 px-6 py-4 text-left ${activeTab === 'database' ? 'bg-primary-600' : 'hover:bg-slate-800'}`}
                     >
                         <Database size={20} /> Database
+                    </button>
+                    <button 
+                        onClick={() => handleNavClick('faq')}
+                        className={`w-full flex items-center gap-3 px-6 py-4 text-left ${activeTab === 'faq' ? 'bg-primary-600' : 'hover:bg-slate-800'}`}
+                    >
+                        <HelpCircle size={20} /> FAQ
                     </button>
                     <button 
                         onClick={() => handleNavClick('settings')}
@@ -368,30 +368,7 @@ const AdminDashboard: React.FC = () => {
                     </div>
                 )}
 
-                {/* FAQ TAB */}
-                {activeTab === 'faq' && (
-                    <div className="space-y-8">
-                         <button onClick={openAddModal} className="bg-primary-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-700 flex items-center gap-2 shadow-lg">
-                            <Plus size={18} /> Tambah FAQ
-                        </button>
-                        <div className="space-y-4">
-                            {faqs.map(item => (
-                                <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div>
-                                        <h4 className="font-bold text-lg">{item.question}</h4>
-                                        <p className="text-sm text-slate-500 line-clamp-2">{item.answer}</p>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => openEditModal(item.id, item)} className="text-blue-500 hover:bg-blue-50 p-2 rounded"><Edit2 size={20} /></button>
-                                        <button onClick={() => deleteFaq(item.id)} className="text-red-500 hover:bg-red-50 p-2 rounded"><Trash2 size={20} /></button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* DATABASE TAB (NEW) */}
+                {/* DATABASE TAB */}
                 {activeTab === 'database' && (
                     <div className="space-y-8 max-w-4xl">
                          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
@@ -470,6 +447,29 @@ const AdminDashboard: React.FC = () => {
                                     Simpan Konfigurasi Database
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* FAQ TAB */}
+                {activeTab === 'faq' && (
+                    <div className="space-y-8">
+                         <button onClick={openAddModal} className="bg-primary-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-700 flex items-center gap-2 shadow-lg">
+                            <Plus size={18} /> Tambah FAQ
+                        </button>
+                        <div className="space-y-4">
+                            {faqs.map(item => (
+                                <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                    <div>
+                                        <h4 className="font-bold text-lg">{item.question}</h4>
+                                        <p className="text-sm text-slate-500 line-clamp-2">{item.answer}</p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => openEditModal(item.id, item)} className="text-blue-500 hover:bg-blue-50 p-2 rounded"><Edit2 size={20} /></button>
+                                        <button onClick={() => deleteFaq(item.id)} className="text-red-500 hover:bg-red-50 p-2 rounded"><Trash2 size={20} /></button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}
