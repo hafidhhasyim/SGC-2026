@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 const AdminDashboard: React.FC = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [passwordInput, setPasswordInput] = useState('');
-    const [activeTab, setActiveTab] = useState<'events' | 'juknis' | 'database' | 'faq' | 'settings'>('events');
+    const [activeTab, setActiveTab] = useState<'events' | 'database' | 'juknis' | 'faq' | 'settings'>('events');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const navigate = useNavigate();
     
@@ -26,7 +26,7 @@ const AdminDashboard: React.FC = () => {
         contactInfo, updateContactInfo,
         socialLinks, updateSocialLinks,
         tursoConfig, updateTursoConfig,
-        resetData, syncToTurso, isSyncing, testTursoConnection
+        resetData, syncToTurso, isSyncing, testTursoConnection, initializeTurso
     } = useData();
 
     // Modal State
@@ -197,6 +197,18 @@ const AdminDashboard: React.FC = () => {
         setIsTestingTurso(false);
         setTursoStatus(success ? 'success' : 'error');
     };
+
+    const handleInitTurso = async () => {
+         if (!tursoForm.dbUrl || !tursoForm.authToken) {
+             alert("Mohon lengkapi URL dan Token terlebih dahulu.");
+             return;
+         }
+         setIsTestingTurso(true);
+         const success = await initializeTurso(tursoForm);
+         setIsTestingTurso(false);
+         if(success) alert("Tabel Database berhasil dibuat/diinisialisasi!");
+         else alert("Gagal membuat tabel. Cek koneksi/token.");
+    };
     
     // --- SETTINGS LOGIC ---
     const handleSaveSettings = async () => {
@@ -278,16 +290,16 @@ const AdminDashboard: React.FC = () => {
                         <LayoutDashboard size={20} /> Events
                     </button>
                     <button 
+                        onClick={() => handleNavClick('database')}
+                        className={`w-full flex items-center gap-3 px-6 py-4 text-left ${activeTab === 'database' ? 'bg-primary-600' : 'hover:bg-slate-800'}`}
+                    >
+                        <Database size={20} /> Database & Integrasi
+                    </button>
+                    <button 
                         onClick={() => handleNavClick('juknis')}
                         className={`w-full flex items-center gap-3 px-6 py-4 text-left ${activeTab === 'juknis' ? 'bg-primary-600' : 'hover:bg-slate-800'}`}
                     >
                         <FileText size={20} /> Juknis
-                    </button>
-                    <button 
-                        onClick={() => handleNavClick('database')}
-                        className={`w-full flex items-center gap-3 px-6 py-4 text-left ${activeTab === 'database' ? 'bg-primary-600' : 'hover:bg-slate-800'}`}
-                    >
-                        <Database size={20} /> Database
                     </button>
                     <button 
                         onClick={() => handleNavClick('faq')}
@@ -318,7 +330,9 @@ const AdminDashboard: React.FC = () => {
 
             {/* Content */}
             <main className="flex-1 p-4 md:p-8 overflow-y-auto w-full">
-                <h1 className="text-3xl font-bold text-slate-800 mb-8 capitalize">Manage {activeTab}</h1>
+                <h1 className="text-3xl font-bold text-slate-800 mb-8 capitalize">
+                    {activeTab === 'database' ? 'Database & Integrasi' : `Manage ${activeTab}`}
+                </h1>
 
                 {/* EVENTS TAB */}
                 {activeTab === 'events' && (
@@ -344,6 +358,109 @@ const AdminDashboard: React.FC = () => {
                     </div>
                 )}
 
+                {/* DATABASE TAB */}
+                {activeTab === 'database' && (
+                    <div className="space-y-8 max-w-4xl">
+                         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 className="font-bold text-lg mb-6 flex items-center gap-2 text-slate-800 border-b pb-4">
+                                <Database size={20} className="text-primary-600" />
+                                Konfigurasi Database Turso
+                            </h3>
+                            
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                                <div className="flex items-start gap-3">
+                                    <AlertTriangle className="text-blue-600 mt-0.5 shrink-0" size={20} />
+                                    <div>
+                                        <h4 className="font-bold text-blue-800 text-sm">Penyimpanan Awan (Cloud Storage)</h4>
+                                        <p className="text-sm text-blue-700 mt-1">
+                                            Fitur ini memungkinkan data website (Events, Juknis, Pengaturan) disimpan di database cloud Turso.
+                                            Jika diaktifkan, perubahan akan disinkronisasi otomatis. Jika dimatikan, data hanya tersimpan di browser ini (Local Storage).
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input 
+                                            type="checkbox" 
+                                            className="sr-only peer" 
+                                            checked={tursoForm.enabled}
+                                            onChange={(e) => setTursoForm({...tursoForm, enabled: e.target.checked})}
+                                        />
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                        <span className="ml-3 text-sm font-medium text-slate-900">Aktifkan Sinkronisasi Turso</span>
+                                    </label>
+                                </div>
+
+                                <div className={!tursoForm.enabled ? 'opacity-50 pointer-events-none' : ''}>
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Database URL</label>
+                                        <input 
+                                            type="text"
+                                            value={tursoForm.dbUrl} 
+                                            onChange={(e) => setTursoForm({...tursoForm, dbUrl: e.target.value})}
+                                            placeholder="libsql://..."
+                                            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-mono text-sm"
+                                        />
+                                    </div>
+                                    <div className="mb-6">
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Auth Token</label>
+                                        <textarea 
+                                            value={tursoForm.authToken} 
+                                            onChange={(e) => setTursoForm({...tursoForm, authToken: e.target.value})}
+                                            placeholder="ey..."
+                                            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-mono text-sm h-24"
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center gap-4">
+                                        <button 
+                                            onClick={handleTestTurso}
+                                            disabled={isTestingTurso}
+                                            className="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-2 disabled:opacity-70"
+                                        >
+                                            {isTestingTurso ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle size={16} />}
+                                            Test Koneksi
+                                        </button>
+
+                                        <button 
+                                            onClick={handleInitTurso}
+                                            disabled={isTestingTurso}
+                                            className="px-4 py-2 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors flex items-center gap-2 disabled:opacity-70"
+                                        >
+                                            <Database size={16} />
+                                            Buat Tabel / Inisialisasi
+                                        </button>
+                                        
+                                        {tursoStatus === 'success' && (
+                                            <span className="text-green-600 font-bold text-sm flex items-center gap-1">
+                                                <CheckCircle size={16} /> Terhubung!
+                                            </span>
+                                        )}
+                                        {tursoStatus === 'error' && (
+                                            <span className="text-red-600 font-bold text-sm flex items-center gap-1">
+                                                <X size={16} /> Gagal Terhubung
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="sticky bottom-0 bg-slate-50 pt-4 pb-8">
+                            <button 
+                                onClick={handleSaveSettings} 
+                                className="w-full bg-primary-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30 flex items-center justify-center gap-2"
+                            >
+                                <Save size={20} />
+                                Simpan & Sinkronisasi
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {/* JUKNIS TAB */}
                 {activeTab === 'juknis' && (
                     <div className="space-y-8">
@@ -353,7 +470,7 @@ const AdminDashboard: React.FC = () => {
                          <div className="space-y-4">
                             {juknisList.map(item => (
                                 <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div>
+                                    <div className="flex-1">
                                         <h4 className="font-bold text-lg">{item.title}</h4>
                                         <p className="text-sm text-slate-500">{item.description}</p>
                                         <p className="text-xs text-primary-500 truncate max-w-md">{item.downloadUrl}</p>
@@ -368,89 +485,6 @@ const AdminDashboard: React.FC = () => {
                     </div>
                 )}
 
-                {/* DATABASE TAB */}
-                {activeTab === 'database' && (
-                    <div className="space-y-8 max-w-4xl">
-                         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                            <h3 className="font-bold text-lg mb-6 flex items-center gap-2 text-slate-800 border-b pb-4">
-                                <Database size={20} className="text-primary-600" />
-                                Database Integration (Turso)
-                            </h3>
-                            <div className="grid grid-cols-1 gap-6">
-                                <div className="flex items-center gap-2">
-                                    <input 
-                                        type="checkbox"
-                                        id="enableTurso"
-                                        checked={tursoForm.enabled}
-                                        onChange={(e) => setTursoForm({...tursoForm, enabled: e.target.checked})}
-                                        className="w-5 h-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
-                                    />
-                                    <label htmlFor="enableTurso" className="font-medium text-slate-700">Aktifkan Penyimpanan Database Turso</label>
-                                </div>
-                                
-                                <div className={`space-y-6 transition-all duration-300 ${!tursoForm.enabled ? 'opacity-50 pointer-events-none grayscale' : ''}`}>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Database URL</label>
-                                        <input 
-                                            type="text"
-                                            value={tursoForm.dbUrl} 
-                                            onChange={(e) => setTursoForm({...tursoForm, dbUrl: e.target.value})}
-                                            placeholder="libsql://your-db.turso.io"
-                                            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-mono text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Auth Token</label>
-                                        <input 
-                                            type="password"
-                                            value={tursoForm.authToken} 
-                                            onChange={(e) => setTursoForm({...tursoForm, authToken: e.target.value})}
-                                            placeholder="eyJ..."
-                                            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-mono text-sm"
-                                        />
-                                        <p className="text-xs text-slate-500 mt-2">
-                                            Data akan disinkronkan ke tabel 'app_settings' di database Turso Anda.
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-4 border-t pt-4">
-                                        <button 
-                                            type="button"
-                                            onClick={handleTestTurso}
-                                            disabled={isTestingTurso || !tursoForm.enabled}
-                                            className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 flex items-center gap-2 transition-colors border border-slate-300"
-                                        >
-                                            {isTestingTurso ? <Loader2 size={16} className="animate-spin" /> : <Database size={16} />}
-                                            Test Koneksi
-                                        </button>
-                                        
-                                        {tursoStatus === 'success' && (
-                                            <span className="text-green-600 text-sm font-medium flex items-center gap-1">
-                                                <CheckCircle size={16} /> Terhubung
-                                            </span>
-                                        )}
-                                        {tursoStatus === 'error' && (
-                                            <span className="text-red-600 text-sm font-medium flex items-center gap-1">
-                                                <AlertTriangle size={16} /> Gagal Terhubung
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="mt-8 pt-6 border-t border-slate-100">
-                                <button 
-                                    onClick={handleSaveSettings} 
-                                    disabled={isSyncing}
-                                    className="bg-primary-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30 flex items-center justify-center gap-2 disabled:bg-primary-400"
-                                >
-                                    {isSyncing ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-                                    Simpan Konfigurasi Database
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
                 {/* FAQ TAB */}
                 {activeTab === 'faq' && (
                     <div className="space-y-8">
@@ -460,7 +494,7 @@ const AdminDashboard: React.FC = () => {
                         <div className="space-y-4">
                             {faqs.map(item => (
                                 <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div>
+                                    <div className="flex-1">
                                         <h4 className="font-bold text-lg">{item.question}</h4>
                                         <p className="text-sm text-slate-500 line-clamp-2">{item.answer}</p>
                                     </div>
@@ -506,17 +540,6 @@ const AdminDashboard: React.FC = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Link Master Juknis / Google Drive Folder</label>
-                                    <input 
-                                        type="text"
-                                        value={juknisUrlInput} 
-                                        onChange={(e) => setJuknisUrlInput(e.target.value)}
-                                        placeholder="https://drive.google.com/drive/folders/..."
-                                        className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                                    />
-                                    <p className="text-xs text-slate-500 mt-1">Jika diisi, pengunjung akan melihat opsi untuk membuka seluruh folder.</p>
-                                </div>
-                                <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">Public Participant Sheet / Embed URL</label>
                                     <input 
                                         type="text"
@@ -525,6 +548,17 @@ const AdminDashboard: React.FC = () => {
                                         placeholder="https://docs.google.com/spreadsheets/..."
                                         className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                                     />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Link Master Juknis (Google Drive)</label>
+                                    <input 
+                                        type="text"
+                                        value={juknisUrlInput} 
+                                        onChange={(e) => setJuknisUrlInput(e.target.value)}
+                                        placeholder="https://drive.google.com/drive/folders/..."
+                                        className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                                    />
+                                    <p className="text-xs text-slate-500 mt-1">Jika diisi, tombol 'Lihat Seluruh Juknis' akan muncul di halaman Juknis.</p>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
@@ -648,10 +682,9 @@ const AdminDashboard: React.FC = () => {
                         <div className="sticky bottom-0 bg-slate-50 pt-4 pb-8">
                             <button 
                                 onClick={handleSaveSettings} 
-                                disabled={isSyncing}
-                                className="w-full bg-primary-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30 flex items-center justify-center gap-2 disabled:bg-primary-400"
+                                className="w-full bg-primary-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30 flex items-center justify-center gap-2"
                             >
-                                {isSyncing ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+                                <Save size={20} />
                                 Simpan Semua Pengaturan
                             </button>
                         </div>

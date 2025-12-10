@@ -57,7 +57,7 @@ const FaqPage: React.FC = () => {
         </div>
         
         <div className="mt-12 text-center text-slate-500">
-            <p>Masih punya pertanyaan? Hubungi kami via WhatsApp atau gunakan fitur Chat AI di pojok kanan bawah.</p>
+            <p>Masih punya pertanyaan? Hubungi kami via WhatsApp atau Sosial Media kami.</p>
         </div>
       </div>
     </div>

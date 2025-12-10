@@ -245,6 +245,17 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return await tursoService.testConnection(config.dbUrl, config.authToken);
     };
 
+    const initializeTurso = async (config: TursoConfig): Promise<boolean> => {
+        if (!config.dbUrl || !config.authToken) return false;
+        try {
+            await tursoService.initTable(config.dbUrl, config.authToken);
+            return true;
+        } catch (e) {
+            console.error("Failed to init Turso table", e);
+            return false;
+        }
+    };
+
     // Reset Data Function
     const resetData = () => {
         if (window.confirm("PERINGATAN: Apakah Anda yakin ingin mereset seluruh data sistem? Semua data konten dan password admin akan kembali ke default.")) {
@@ -340,6 +351,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             resetData,
             syncToTurso,
             testTursoConnection,
+            initializeTurso,
             isSyncing
         }}>
             {children}

@@ -1,7 +1,8 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { EventData, Category, JuknisItem, FaqItem, DataContextType, ContactInfo, SocialLinks, RegistrationFormData } from '../types';
+import { EventData, Category, JuknisItem, FaqItem, DataContextType, ContactInfo, SocialLinks, RegistrationFormData, TursoConfig } from '../types';
+import { tursoService } from '../services/tursoService';
 
-const STORAGE_KEY = 'SGC_APP_DATA_V3'; // Bumped version for cleanup
+const STORAGE_KEY = 'SGC_APP_DATA_V5'; // Bumped version for Turso
 
 // Initial Mock Data updated for SGC 2026
 const INITIAL_EVENTS: EventData[] = [
@@ -109,7 +110,8 @@ const INITIAL_REGISTRATION_URL = '#';
 const INITIAL_PUBLIC_PARTICIPANTS_URL = '';
 const INITIAL_BROCHURE_URL = '#';
 const INITIAL_LOGO_URL = '';
-const INITIAL_BANNER_URL = 'https://drive.google.com/thumbnail?id=1wAHp_r0aMa743kUnzGN0uAVApl5RHmJh&sz=w1920&v=2'; // Default Banner
+const INITIAL_BANNER_URL = 'https://drive.google.com/thumbnail?id=1wAHp_r0aMa743kUnzGN0uAVApl5RHmJh&sz=w1920&v=2'; 
+const INITIAL_JUKNIS_URL = '';
 const INITIAL_ADMIN_PASSWORD = 'admin123';
 
 const INITIAL_CONTACT_INFO: ContactInfo = {
@@ -124,10 +126,17 @@ const INITIAL_SOCIAL_LINKS: SocialLinks = {
     facebook: 'https://facebook.com/smpn1genteng'
 };
 
+const INITIAL_TURSO_CONFIG: TursoConfig = {
+    dbUrl: 'libsql://database-sgc-vercel-icfg-gvxautgzlhsdxfc7sdwgogob.aws-us-east-1.turso.io',
+    authToken: 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NjUzNzI4NjYsImlkIjoiZjViZTIxZjItZDk1OC00MGRkLTkwZDMtODEzYTk2OTI4YTVhIiwicmlkIjoiZWE4NTE0YzAtMjMzYS00N2FjLTg1Y2UtNDFkOTMxZGM4NWIyIn0.e4aZM_GZRygAaBh9rcZmflhW7ZASYlMfcSsKShaba4vZSgNvLlQkvwogZ_HK_i6kPqDkPlIQ-pwtZp8USyPJBg',
+    enabled: true
+};
+
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    // Load initial state from local storage or fall back to defaults
+    
+    // Initial State Loader
     const loadState = () => {
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
@@ -150,25 +159,102 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [brochureUrl, setBrochureUrl] = useState<string>(savedState?.brochureUrl || INITIAL_BROCHURE_URL);
     const [logoUrl, setLogoUrl] = useState<string>(savedState?.logoUrl || INITIAL_LOGO_URL);
     const [bannerUrl, setBannerUrl] = useState<string>(savedState?.bannerUrl || INITIAL_BANNER_URL);
+    const [juknisUrl, setJuknisUrl] = useState<string>(savedState?.juknisUrl || INITIAL_JUKNIS_URL);
     
     // Settings
     const [adminPassword, setAdminPassword] = useState<string>(savedState?.adminPassword || INITIAL_ADMIN_PASSWORD);
     const [contactInfo, setContactInfo] = useState<ContactInfo>(savedState?.contactInfo || INITIAL_CONTACT_INFO);
     const [socialLinks, setSocialLinks] = useState<SocialLinks>(savedState?.socialLinks || INITIAL_SOCIAL_LINKS);
+    
+    // Turso Config
+    const [tursoConfig, setTursoConfig] = useState<TursoConfig>(savedState?.tursoConfig || INITIAL_TURSO_CONFIG);
+    const [isSyncing, setIsSyncing] = useState(false);
 
     // Persist to local storage whenever state changes
     useEffect(() => {
         try {
             const stateToSave = { 
                 events, juknisList, faqs, 
-                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl,
-                adminPassword, contactInfo, socialLinks
+                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl,
+                adminPassword, contactInfo, socialLinks, tursoConfig
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
         } catch (e) {
             console.error("Failed to save state", e);
         }
-    }, [events, juknisList, faqs, registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, adminPassword, contactInfo, socialLinks]);
+    }, [events, juknisList, faqs, registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, adminPassword, contactInfo, socialLinks, tursoConfig]);
+
+    // Attempt to load from Turso on mount if enabled
+    useEffect(() => {
+        const fetchRemoteData = async () => {
+            if (tursoConfig.enabled && tursoConfig.dbUrl && tursoConfig.authToken) {
+                console.log("Attempting to load data from Turso...");
+                const remoteData = await tursoService.loadData(tursoConfig.dbUrl, tursoConfig.authToken);
+                if (remoteData) {
+                    console.log("Data loaded from Turso successfully.");
+                    // Update state with remote data
+                    if (remoteData.events) setEvents(remoteData.events);
+                    if (remoteData.juknisList) setJuknisList(remoteData.juknisList);
+                    if (remoteData.faqs) setFaqs(remoteData.faqs);
+                    if (remoteData.registrationUrl) setRegistrationUrl(remoteData.registrationUrl);
+                    if (remoteData.publicParticipantsUrl) setPublicParticipantsUrl(remoteData.publicParticipantsUrl);
+                    if (remoteData.brochureUrl) setBrochureUrl(remoteData.brochureUrl);
+                    if (remoteData.logoUrl) setLogoUrl(remoteData.logoUrl);
+                    if (remoteData.bannerUrl) setBannerUrl(remoteData.bannerUrl);
+                    if (remoteData.juknisUrl) setJuknisUrl(remoteData.juknisUrl);
+                    if (remoteData.adminPassword) setAdminPassword(remoteData.adminPassword);
+                    if (remoteData.contactInfo) setContactInfo(remoteData.contactInfo);
+                    if (remoteData.socialLinks) setSocialLinks(remoteData.socialLinks);
+                }
+            }
+        };
+        
+        // Only run once on mount if config exists
+        fetchRemoteData();
+    }, []); // Empty dependency array to run only on mount
+
+    // Manual Sync function with optional override
+    const syncToTurso = async (overrideData?: any): Promise<boolean> => {
+        // Use override config if provided (for example, before state updates), otherwise use current state
+        const config = overrideData?.tursoConfig || tursoConfig;
+
+        if (!config.enabled || !config.dbUrl || !config.authToken) {
+            return false;
+        }
+
+        setIsSyncing(true);
+        try {
+            const currentState = { 
+                events, juknisList, faqs, 
+                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl,
+                adminPassword, contactInfo, socialLinks, tursoConfig,
+                ...overrideData // Apply overrides
+            };
+            await tursoService.saveData(config.dbUrl, config.authToken, JSON.stringify(currentState));
+            setIsSyncing(false);
+            return true;
+        } catch (error) {
+            console.error("Failed to sync to Turso", error);
+            setIsSyncing(false);
+            return false;
+        }
+    };
+
+    const testTursoConnection = async (config: TursoConfig): Promise<boolean> => {
+        if (!config.dbUrl || !config.authToken) return false;
+        return await tursoService.testConnection(config.dbUrl, config.authToken);
+    };
+
+    const initializeTurso = async (config: TursoConfig): Promise<boolean> => {
+        if (!config.dbUrl || !config.authToken) return false;
+        try {
+            await tursoService.initTable(config.dbUrl, config.authToken);
+            return true;
+        } catch (e) {
+            console.error("Failed to init Turso table", e);
+            return false;
+        }
+    };
 
     // Reset Data Function
     const resetData = () => {
@@ -182,9 +268,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setBrochureUrl(INITIAL_BROCHURE_URL);
             setLogoUrl(INITIAL_LOGO_URL);
             setBannerUrl(INITIAL_BANNER_URL);
+            setJuknisUrl(INITIAL_JUKNIS_URL);
             setAdminPassword(INITIAL_ADMIN_PASSWORD);
             setContactInfo(INITIAL_CONTACT_INFO);
             setSocialLinks(INITIAL_SOCIAL_LINKS);
+            setTursoConfig(INITIAL_TURSO_CONFIG);
             alert("Sistem berhasil direset ke pengaturan awal.");
         }
     };
@@ -234,33 +322,37 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const updateBrochureUrl = (url: string) => setBrochureUrl(url);
     const updateLogoUrl = (url: string) => setLogoUrl(url);
     const updateBannerUrl = (url: string) => setBannerUrl(url);
+    const updateJuknisUrl = (url: string) => setJuknisUrl(url);
     
     // Settings Actions
     const updateAdminPassword = (password: string) => setAdminPassword(password);
     const updateContactInfo = (info: ContactInfo) => setContactInfo(info);
     const updateSocialLinks = (links: SocialLinks) => setSocialLinks(links);
+    const updateTursoConfig = (config: TursoConfig) => setTursoConfig(config);
 
-    // Registration Action
+    // Mock Registration
     const registerParticipant = (data: RegistrationFormData) => {
         console.log("Registered Participant:", data);
-        // In a real app, this would send data to a backend or Google Sheet
     };
 
     return (
         <DataContext.Provider value={{ 
             events, juknisList, faqs,
-            registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl,
-            adminPassword, contactInfo, socialLinks,
+            registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl,
+            adminPassword, contactInfo, socialLinks, tursoConfig,
             
             updateEvent, addEvent, deleteEvent,
             updateJuknis, addJuknis, deleteJuknis,
             updateFaq, addFaq, deleteFaq,
-            updateRegistrationUrl, updatePublicParticipantsUrl, updateBrochureUrl, updateLogoUrl, updateBannerUrl,
-            updateAdminPassword, updateContactInfo, updateSocialLinks,
+            updateRegistrationUrl, updatePublicParticipantsUrl, updateBrochureUrl, updateLogoUrl, updateBannerUrl, updateJuknisUrl,
+            updateAdminPassword, updateContactInfo, updateSocialLinks, updateTursoConfig,
             
             registerParticipant,
-
-            resetData
+            resetData,
+            syncToTurso,
+            testTursoConnection,
+            initializeTurso,
+            isSyncing
         }}>
             {children}
         </DataContext.Provider>

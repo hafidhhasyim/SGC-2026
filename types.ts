@@ -53,6 +53,12 @@ export interface RegistrationFormData {
   paymentProof: File | null;
 }
 
+export interface TursoConfig {
+    dbUrl: string;
+    authToken: string;
+    enabled: boolean;
+}
+
 export interface DataContextType {
     events: EventData[];
     juknisList: JuknisItem[];
@@ -64,11 +70,13 @@ export interface DataContextType {
     brochureUrl: string;
     logoUrl: string;
     bannerUrl: string;
+    juknisUrl: string;
 
     // Settings
     adminPassword: string;
     contactInfo: ContactInfo;
     socialLinks: SocialLinks;
+    tursoConfig: TursoConfig; // New Turso Config
     
     // CRUD Actions
     updateEvent: (event: EventData) => void;
@@ -88,13 +96,19 @@ export interface DataContextType {
     updateBrochureUrl: (url: string) => void;
     updateLogoUrl: (url: string) => void;
     updateBannerUrl: (url: string) => void;
+    updateJuknisUrl: (url: string) => void;
     
     updateAdminPassword: (password: string) => void;
     updateContactInfo: (info: ContactInfo) => void;
     updateSocialLinks: (links: SocialLinks) => void;
+    updateTursoConfig: (config: TursoConfig) => void; // New action
 
     // Registration
     registerParticipant: (data: RegistrationFormData) => void;
 
     resetData: () => void;
+    syncToTurso: (overrideData?: any) => Promise<boolean>; // Manual sync action with optional override
+    testTursoConnection: (config: TursoConfig) => Promise<boolean>; // Test connection
+    initializeTurso: (config: TursoConfig) => Promise<boolean>; // Create tables
+    isSyncing: boolean;
 }

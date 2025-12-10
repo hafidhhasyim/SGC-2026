@@ -1,9 +1,9 @@
 import React from 'react';
-import { FileText, Download } from 'lucide-react';
+import { FileText, Download, ExternalLink } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 
 const JuknisSection: React.FC = () => {
-  const { juknisList } = useData();
+  const { juknisList, juknisUrl } = useData();
   const featuredJuknis = juknisList[0]; // Just show the first one as featured
 
   const handleDownload = (e: React.MouseEvent, url: string) => {
@@ -27,7 +27,7 @@ const JuknisSection: React.FC = () => {
           Sebelum mendaftar, pastikan Anda telah membaca dan memahami seluruh peraturan dan ketentuan teknis setiap perlombaan melalui dokumen resmi di bawah ini.
         </p>
 
-        {featuredJuknis && (
+        {featuredJuknis ? (
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
@@ -43,6 +43,8 @@ const JuknisSection: React.FC = () => {
                 <a 
                   href={featuredJuknis.downloadUrl} 
                   onClick={(e) => handleDownload(e, featuredJuknis.downloadUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-2 bg-secondary-500 hover:bg-secondary-400 text-slate-900 px-6 py-3 rounded-xl font-bold transition-colors w-full md:w-auto justify-center shadow-lg"
                 >
                   <Download size={20} />
@@ -50,7 +52,31 @@ const JuknisSection: React.FC = () => {
                 </a>
               </div>
             </div>
-        )}
+        ) : juknisUrl && juknisUrl.trim() !== '' ? (
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="bg-white/20 p-4 rounded-xl">
+                    <FileText size={40} className="text-white" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold text-white">Folder Juknis Lengkap</h3>
+                    <p className="text-primary-200 text-sm">Akses seluruh dokumen petunjuk teknis di Google Drive.</p>
+                  </div>
+                </div>
+                
+                <a 
+                  href={juknisUrl} 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-secondary-500 hover:bg-secondary-400 text-slate-900 px-6 py-3 rounded-xl font-bold transition-colors w-full md:w-auto justify-center shadow-lg"
+                >
+                  <ExternalLink size={20} />
+                  Buka Folder Juknis
+                </a>
+              </div>
+            </div>
+        ) : null}
         
         <div className="mt-8 pt-6 border-t border-white/10 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
              <div className="bg-primary-800/50 p-4 rounded-lg">
