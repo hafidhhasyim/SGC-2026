@@ -50,7 +50,7 @@ const INITIAL_EVENTS: EventData[] = [
     time: '08:00 WIB',
     location: 'SMP Negeri 1 Genteng',
     fee: 'Rp 50.000',
-    description: 'Tuangkan imajinasimu dalam gambar yang bercerita.',
+    description: 'Tuangkan imajinasimu dalam gambar yang bercerita. Khusus kelas 4,5, & 6',
     iconName: 'Pencil',
     details: ['Sabtu, 6 Februari 2026', 'Rp 50.000 / Peserta', 'Tema Kreatif']
   },
@@ -62,7 +62,7 @@ const INITIAL_EVENTS: EventData[] = [
     time: '08:30 WIB',
     location: 'SMP Negeri 1 Genteng',
     fee: 'Rp 50.000',
-    description: 'Khusus untuk adik-adik yang gemar mewarnai. Salurkan bakat senimu!',
+    description: 'Khusus untuk adik-adik kelas 1,2 & 3 yang gemar mewarnai. Salurkan bakat senimu!',
     iconName: 'Palette',
     details: ['Sabtu, 6 Februari 2026', 'Rp 50.000 / Peserta', 'Hadiah Menarik']
   },
