@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import { EventData, Category, JuknisItem, FaqItem } from '../types';
-import { Trash2, Edit2, Plus, LogOut, LayoutDashboard, FileText, HelpCircle, Save, X, RotateCcw, Settings, ExternalLink, Lock, Phone, Image } from 'lucide-react';
+import { Trash2, Edit2, Plus, LogOut, LayoutDashboard, FileText, HelpCircle, Save, X, RotateCcw, Settings, ExternalLink, Lock, Phone, Image, Database, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard: React.FC = () => {
@@ -24,7 +24,8 @@ const AdminDashboard: React.FC = () => {
         adminPassword, updateAdminPassword,
         contactInfo, updateContactInfo,
         socialLinks, updateSocialLinks,
-        resetData
+        tursoConfig, updateTursoConfig,
+        resetData, syncToTurso, isSyncing
     } = useData();
 
     // Modal State
@@ -48,6 +49,9 @@ const AdminDashboard: React.FC = () => {
     const [newPassword, setNewPassword] = useState('');
     const [contactForm, setContactForm] = useState(contactInfo);
     const [socialForm, setSocialForm] = useState(socialLinks);
+
+    // Turso Config Form
+    const [tursoForm, setTursoForm] = useState(tursoConfig);
     
     // Sync settings with context
     useEffect(() => {
@@ -59,7 +63,8 @@ const AdminDashboard: React.FC = () => {
         setJuknisUrlInput(juknisUrl);
         setContactForm(contactInfo);
         setSocialForm(socialLinks);
-    }, [registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, contactInfo, socialLinks]);
+        setTursoForm(tursoConfig);
+    }, [registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, contactInfo, socialLinks, tursoConfig]);
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -174,7 +179,7 @@ const AdminDashboard: React.FC = () => {
     };
     
     // --- SETTINGS LOGIC ---
-    const handleSaveSettings = () => {
+    const handleSaveSettings = async () => {
         updateRegistrationUrl(urlInput);
         updatePublicParticipantsUrl(sheetUrlInput);
         updateBrochureUrl(brochureUrlInput);
@@ -183,13 +188,24 @@ const AdminDashboard: React.FC = () => {
         updateJuknisUrl(juknisUrlInput);
         updateContactInfo(contactForm);
         updateSocialLinks(socialForm);
+        updateTursoConfig(tursoForm);
         
         if (newPassword.trim() !== '') {
             updateAdminPassword(newPassword);
             setNewPassword(''); // Clear after save
         }
         
-        alert('Pengaturan berhasil diperbarui!');
+        // Attempt to sync to Turso immediately
+        if (tursoForm.enabled) {
+            const success = await syncToTurso();
+            if (success) {
+                alert('Pengaturan berhasil diperbarui dan disinkronkan ke Database Turso!');
+            } else {
+                 alert('Pengaturan disimpan lokal, TETAPI gagal sinkron ke Turso. Cek koneksi atau token.');
+            }
+        } else {
+             alert('Pengaturan berhasil diperbarui (Disimpan di Browser).');
+        }
     };
 
     return (
@@ -317,6 +333,53 @@ const AdminDashboard: React.FC = () => {
                 {/* SETTINGS TAB */}
                 {activeTab === 'settings' && (
                     <div className="space-y-8 max-w-4xl">
+                         {/* TURSO DATABASE SECTION */}
+                         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 className="font-bold text-lg mb-6 flex items-center gap-2 text-slate-800 border-b pb-4">
+                                <Database size={20} className="text-primary-600" />
+                                Database Integration (Turso)
+                            </h3>
+                            <div className="grid grid-cols-1 gap-6">
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="checkbox"
+                                        id="enableTurso"
+                                        checked={tursoForm.enabled}
+                                        onChange={(e) => setTursoForm({...tursoForm, enabled: e.target.checked})}
+                                        className="w-5 h-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+                                    />
+                                    <label htmlFor="enableTurso" className="font-medium text-slate-700">Aktifkan Penyimpanan Database Turso</label>
+                                </div>
+                                {tursoForm.enabled && (
+                                    <>
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-2">Database URL</label>
+                                            <input 
+                                                type="text"
+                                                value={tursoForm.dbUrl} 
+                                                onChange={(e) => setTursoForm({...tursoForm, dbUrl: e.target.value})}
+                                                placeholder="libsql://your-db.turso.io"
+                                                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-mono text-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-2">Auth Token</label>
+                                            <input 
+                                                type="password"
+                                                value={tursoForm.authToken} 
+                                                onChange={(e) => setTursoForm({...tursoForm, authToken: e.target.value})}
+                                                placeholder="eyJ..."
+                                                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-mono text-sm"
+                                            />
+                                            <p className="text-xs text-slate-500 mt-2">
+                                                Data akan disinkronkan ke tabel 'app_settings' di database Turso Anda.
+                                            </p>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
                         {/* URLS SECTION */}
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                             <h3 className="font-bold text-lg mb-6 flex items-center gap-2 text-slate-800 border-b pb-4">
@@ -488,9 +551,10 @@ const AdminDashboard: React.FC = () => {
                         <div className="sticky bottom-0 bg-slate-50 pt-4 pb-8">
                             <button 
                                 onClick={handleSaveSettings} 
-                                className="w-full bg-primary-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30 flex items-center justify-center gap-2"
+                                disabled={isSyncing}
+                                className="w-full bg-primary-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30 flex items-center justify-center gap-2 disabled:bg-primary-400"
                             >
-                                <Save size={20} />
+                                {isSyncing ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
                                 Simpan Semua Pengaturan
                             </button>
                         </div>
