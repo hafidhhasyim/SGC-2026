@@ -108,5 +108,6 @@ export interface DataContextType {
 
     resetData: () => void;
     syncToTurso: (overrideData?: any) => Promise<boolean>; // Manual sync action with optional override
+    testTursoConnection: (config: TursoConfig) => Promise<boolean>; // Test connection
     isSyncing: boolean;
 }

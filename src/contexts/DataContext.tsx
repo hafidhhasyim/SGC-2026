@@ -240,6 +240,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
+    const testTursoConnection = async (config: TursoConfig): Promise<boolean> => {
+        if (!config.dbUrl || !config.authToken) return false;
+        return await tursoService.testConnection(config.dbUrl, config.authToken);
+    };
+
     // Reset Data Function
     const resetData = () => {
         if (window.confirm("PERINGATAN: Apakah Anda yakin ingin mereset seluruh data sistem? Semua data konten dan password admin akan kembali ke default.")) {
@@ -334,6 +339,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             registerParticipant,
             resetData,
             syncToTurso,
+            testTursoConnection,
             isSyncing
         }}>
             {children}
