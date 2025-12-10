@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { EventData, Category, JuknisItem, FaqItem, DataContextType, ContactInfo, SocialLinks, RegistrationFormData } from '../types';
 
-const STORAGE_KEY = 'SGC_APP_DATA_V3'; // Bumped version for cleanup
+const STORAGE_KEY = 'SGC_APP_DATA_V4'; // Bumped version for new fields
 
 // Initial Mock Data updated for SGC 2026
 const INITIAL_EVENTS: EventData[] = [
@@ -110,6 +110,7 @@ const INITIAL_PUBLIC_PARTICIPANTS_URL = '';
 const INITIAL_BROCHURE_URL = '#';
 const INITIAL_LOGO_URL = '';
 const INITIAL_BANNER_URL = 'https://drive.google.com/thumbnail?id=1wAHp_r0aMa743kUnzGN0uAVApl5RHmJh&sz=w1920&v=2'; // Default Banner
+const INITIAL_JUKNIS_URL = '';
 const INITIAL_ADMIN_PASSWORD = 'admin123';
 
 const INITIAL_CONTACT_INFO: ContactInfo = {
@@ -150,6 +151,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [brochureUrl, setBrochureUrl] = useState<string>(savedState?.brochureUrl || INITIAL_BROCHURE_URL);
     const [logoUrl, setLogoUrl] = useState<string>(savedState?.logoUrl || INITIAL_LOGO_URL);
     const [bannerUrl, setBannerUrl] = useState<string>(savedState?.bannerUrl || INITIAL_BANNER_URL);
+    const [juknisUrl, setJuknisUrl] = useState<string>(savedState?.juknisUrl || INITIAL_JUKNIS_URL);
     
     // Settings
     const [adminPassword, setAdminPassword] = useState<string>(savedState?.adminPassword || INITIAL_ADMIN_PASSWORD);
@@ -161,14 +163,14 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             const stateToSave = { 
                 events, juknisList, faqs, 
-                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl,
+                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl,
                 adminPassword, contactInfo, socialLinks
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
         } catch (e) {
             console.error("Failed to save state", e);
         }
-    }, [events, juknisList, faqs, registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, adminPassword, contactInfo, socialLinks]);
+    }, [events, juknisList, faqs, registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, adminPassword, contactInfo, socialLinks]);
 
     // Reset Data Function
     const resetData = () => {
@@ -182,6 +184,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setBrochureUrl(INITIAL_BROCHURE_URL);
             setLogoUrl(INITIAL_LOGO_URL);
             setBannerUrl(INITIAL_BANNER_URL);
+            setJuknisUrl(INITIAL_JUKNIS_URL);
             setAdminPassword(INITIAL_ADMIN_PASSWORD);
             setContactInfo(INITIAL_CONTACT_INFO);
             setSocialLinks(INITIAL_SOCIAL_LINKS);
@@ -234,6 +237,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const updateBrochureUrl = (url: string) => setBrochureUrl(url);
     const updateLogoUrl = (url: string) => setLogoUrl(url);
     const updateBannerUrl = (url: string) => setBannerUrl(url);
+    const updateJuknisUrl = (url: string) => setJuknisUrl(url);
     
     // Settings Actions
     const updateAdminPassword = (password: string) => setAdminPassword(password);
@@ -249,13 +253,13 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return (
         <DataContext.Provider value={{ 
             events, juknisList, faqs,
-            registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl,
+            registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl,
             adminPassword, contactInfo, socialLinks,
             
             updateEvent, addEvent, deleteEvent,
             updateJuknis, addJuknis, deleteJuknis,
             updateFaq, addFaq, deleteFaq,
-            updateRegistrationUrl, updatePublicParticipantsUrl, updateBrochureUrl, updateLogoUrl, updateBannerUrl,
+            updateRegistrationUrl, updatePublicParticipantsUrl, updateBrochureUrl, updateLogoUrl, updateBannerUrl, updateJuknisUrl,
             updateAdminPassword, updateContactInfo, updateSocialLinks,
             
             registerParticipant,

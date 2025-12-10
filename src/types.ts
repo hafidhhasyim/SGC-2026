@@ -64,6 +64,7 @@ export interface DataContextType {
     brochureUrl: string;
     logoUrl: string;
     bannerUrl: string;
+    juknisUrl: string; // New: Master Juknis Link
 
     // Settings
     adminPassword: string;
@@ -88,6 +89,7 @@ export interface DataContextType {
     updateBrochureUrl: (url: string) => void;
     updateLogoUrl: (url: string) => void;
     updateBannerUrl: (url: string) => void;
+    updateJuknisUrl: (url: string) => void; // New
     
     updateAdminPassword: (password: string) => void;
     updateContactInfo: (info: ContactInfo) => void;
