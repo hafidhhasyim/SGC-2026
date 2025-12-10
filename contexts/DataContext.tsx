@@ -92,7 +92,7 @@ const INITIAL_FAQS: FaqItem[] = [
     {
         id: '2',
         question: 'Bagaimana cara pembayarannya?',
-        answer: 'Pembayaran ditransfer ke Bank Jatim No. Rek 0553010420 a.n. Lailatul Zuhro.'
+        answer: 'Pembayaran ditransfer ke Bank Jatim No. Rek 0553010420 / BRI No Rek 057701030180508 a.n. lailatul zuhroh'
     },
     {
         id: '3',
@@ -116,8 +116,8 @@ const INITIAL_ADMIN_PASSWORD = 'spensa123';
 
 const INITIAL_CONTACT_INFO: ContactInfo = {
     address: 'Jl. Bromo No. 49 Genteng - Banyuwangi',
-    phone1: '0819-3695-1078 (Rizki Murni)',
-    phone2: '0819-3695-1078 (Lutfhia Laili)',
+    phone1: '0819 3695 1078 Bu Kiki',
+    phone2: '0823 3744 6950 Bu Fia',
     email: 'panitia@sgc-spensa.sch.id'
 };
 

@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, ReactNode, useEffect } from
 import { EventData, Category, JuknisItem, FaqItem, DataContextType, ContactInfo, SocialLinks, RegistrationFormData, TursoConfig } from '../types';
 import { tursoService } from '../services/tursoService';
 
-const STORAGE_KEY = 'SGC_APP_DATA_V6'; // Bumped version for New Assets
+const STORAGE_KEY = 'SGC_APP_DATA_V7'; // Bumped version for Offline Form URL
 
 // Initial Mock Data updated for SGC 2026
 const INITIAL_EVENTS: EventData[] = [
@@ -74,12 +74,6 @@ const INITIAL_JUKNIS: JuknisItem[] = [
         title: 'Buku Panduan SGC 2026',
         description: 'Panduan lengkap seluruh cabang lomba, tata tertib, dan teknis pelaksanaan SGC 2026.',
         downloadUrl: 'https://drive.google.com/file/d/1sfm9IZ8sddmHggeykXDhSEhorDMkeORO/view?usp=sharing'
-    },
-    {
-        id: '2',
-        title: 'Formulir Pendaftaran Offline',
-        description: 'Bagi peserta yang mendaftar secara kolektif via sekolah, formulir dapat diunduh di sini.',
-        downloadUrl: '#'
     }
 ];
 
@@ -112,6 +106,7 @@ const INITIAL_BROCHURE_URL = 'https://drive.google.com/file/d/1Y6bQrXLwRZpWAiUoF
 const INITIAL_LOGO_URL = 'https://drive.google.com/file/d/1SnT37ISkjfMT9Nff0WJK3y_O1D40HRFI/view?usp=sharing';
 const INITIAL_BANNER_URL = 'https://drive.google.com/file/d/1wAHp_r0aMa743kUnzGN0uAVApl5RHmJh/view?usp=sharing'; 
 const INITIAL_JUKNIS_URL = 'https://drive.google.com/file/d/1sfm9IZ8sddmHggeykXDhSEhorDMkeORO/view?usp=sharing';
+const INITIAL_OFFLINE_FORM_URL = '#';
 const INITIAL_ADMIN_PASSWORD = 'admin123';
 
 const INITIAL_CONTACT_INFO: ContactInfo = {
@@ -160,6 +155,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [logoUrl, setLogoUrl] = useState<string>(savedState?.logoUrl || INITIAL_LOGO_URL);
     const [bannerUrl, setBannerUrl] = useState<string>(savedState?.bannerUrl || INITIAL_BANNER_URL);
     const [juknisUrl, setJuknisUrl] = useState<string>(savedState?.juknisUrl || INITIAL_JUKNIS_URL);
+    const [offlineFormUrl, setOfflineFormUrl] = useState<string>(savedState?.offlineFormUrl || INITIAL_OFFLINE_FORM_URL);
     
     // Settings
     const [adminPassword, setAdminPassword] = useState<string>(savedState?.adminPassword || INITIAL_ADMIN_PASSWORD);
@@ -175,14 +171,14 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             const stateToSave = { 
                 events, juknisList, faqs, 
-                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl,
+                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, offlineFormUrl,
                 adminPassword, contactInfo, socialLinks, tursoConfig
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
         } catch (e) {
             console.error("Failed to save state", e);
         }
-    }, [events, juknisList, faqs, registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, adminPassword, contactInfo, socialLinks, tursoConfig]);
+    }, [events, juknisList, faqs, registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, offlineFormUrl, adminPassword, contactInfo, socialLinks, tursoConfig]);
 
     // Attempt to load from Turso on mount if enabled
     useEffect(() => {
@@ -202,6 +198,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     if (remoteData.logoUrl) setLogoUrl(remoteData.logoUrl);
                     if (remoteData.bannerUrl) setBannerUrl(remoteData.bannerUrl);
                     if (remoteData.juknisUrl) setJuknisUrl(remoteData.juknisUrl);
+                    if (remoteData.offlineFormUrl) setOfflineFormUrl(remoteData.offlineFormUrl);
                     if (remoteData.adminPassword) setAdminPassword(remoteData.adminPassword);
                     if (remoteData.contactInfo) setContactInfo(remoteData.contactInfo);
                     if (remoteData.socialLinks) setSocialLinks(remoteData.socialLinks);
@@ -226,7 +223,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             const currentState = { 
                 events, juknisList, faqs, 
-                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl,
+                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, offlineFormUrl,
                 adminPassword, contactInfo, socialLinks, tursoConfig,
                 ...overrideData // Apply overrides
             };
@@ -269,6 +266,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setLogoUrl(INITIAL_LOGO_URL);
             setBannerUrl(INITIAL_BANNER_URL);
             setJuknisUrl(INITIAL_JUKNIS_URL);
+            setOfflineFormUrl(INITIAL_OFFLINE_FORM_URL);
             setAdminPassword(INITIAL_ADMIN_PASSWORD);
             setContactInfo(INITIAL_CONTACT_INFO);
             setSocialLinks(INITIAL_SOCIAL_LINKS);
@@ -323,6 +321,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const updateLogoUrl = (url: string) => setLogoUrl(url);
     const updateBannerUrl = (url: string) => setBannerUrl(url);
     const updateJuknisUrl = (url: string) => setJuknisUrl(url);
+    const updateOfflineFormUrl = (url: string) => setOfflineFormUrl(url);
     
     // Settings Actions
     const updateAdminPassword = (password: string) => setAdminPassword(password);
@@ -338,13 +337,13 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return (
         <DataContext.Provider value={{ 
             events, juknisList, faqs,
-            registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl,
+            registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, offlineFormUrl,
             adminPassword, contactInfo, socialLinks, tursoConfig,
             
             updateEvent, addEvent, deleteEvent,
             updateJuknis, addJuknis, deleteJuknis,
             updateFaq, addFaq, deleteFaq,
-            updateRegistrationUrl, updatePublicParticipantsUrl, updateBrochureUrl, updateLogoUrl, updateBannerUrl, updateJuknisUrl,
+            updateRegistrationUrl, updatePublicParticipantsUrl, updateBrochureUrl, updateLogoUrl, updateBannerUrl, updateJuknisUrl, updateOfflineFormUrl,
             updateAdminPassword, updateContactInfo, updateSocialLinks, updateTursoConfig,
             
             registerParticipant,

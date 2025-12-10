@@ -23,19 +23,7 @@ const JuknisPage: React.FC = () => {
         </div>
 
         {/* Master Juknis Link Button */}
-        {juknisUrl && juknisUrl.trim() !== '' && (
-            <div className="mb-10 flex justify-center">
-                <a 
-                    href={juknisUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-3 bg-secondary-500 text-slate-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-secondary-400 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
-                >
-                    <ExternalLink size={24} />
-                    Lihat Seluruh Juknis di Google Drive
-                </a>
-            </div>
-        )}
+        
 
         <div className="space-y-6">
             {juknisList.map(item => (

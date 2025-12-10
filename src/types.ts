@@ -71,12 +71,13 @@ export interface DataContextType {
     logoUrl: string;
     bannerUrl: string;
     juknisUrl: string;
+    offlineFormUrl: string; // New: Link khusus formulir offline
 
     // Settings
     adminPassword: string;
     contactInfo: ContactInfo;
     socialLinks: SocialLinks;
-    tursoConfig: TursoConfig; // New Turso Config
+    tursoConfig: TursoConfig;
     
     // CRUD Actions
     updateEvent: (event: EventData) => void;
@@ -97,18 +98,19 @@ export interface DataContextType {
     updateLogoUrl: (url: string) => void;
     updateBannerUrl: (url: string) => void;
     updateJuknisUrl: (url: string) => void;
+    updateOfflineFormUrl: (url: string) => void; // New action
     
     updateAdminPassword: (password: string) => void;
     updateContactInfo: (info: ContactInfo) => void;
     updateSocialLinks: (links: SocialLinks) => void;
-    updateTursoConfig: (config: TursoConfig) => void; // New action
+    updateTursoConfig: (config: TursoConfig) => void;
 
     // Registration
     registerParticipant: (data: RegistrationFormData) => void;
 
     resetData: () => void;
-    syncToTurso: (overrideData?: any) => Promise<boolean>; // Manual sync action with optional override
-    testTursoConnection: (config: TursoConfig) => Promise<boolean>; // Test connection
-    initializeTurso: (config: TursoConfig) => Promise<boolean>; // Create tables
+    syncToTurso: (overrideData?: any) => Promise<boolean>;
+    testTursoConnection: (config: TursoConfig) => Promise<boolean>;
+    initializeTurso: (config: TursoConfig) => Promise<boolean>;
     isSyncing: boolean;
 }

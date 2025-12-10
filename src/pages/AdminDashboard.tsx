@@ -22,6 +22,7 @@ const AdminDashboard: React.FC = () => {
         logoUrl, updateLogoUrl,
         bannerUrl, updateBannerUrl,
         juknisUrl, updateJuknisUrl,
+        offlineFormUrl, updateOfflineFormUrl,
         adminPassword, updateAdminPassword,
         contactInfo, updateContactInfo,
         socialLinks, updateSocialLinks,
@@ -46,6 +47,7 @@ const AdminDashboard: React.FC = () => {
     const [logoUrlInput, setLogoUrlInput] = useState(logoUrl);
     const [bannerUrlInput, setBannerUrlInput] = useState(bannerUrl);
     const [juknisUrlInput, setJuknisUrlInput] = useState(juknisUrl);
+    const [offlineFormUrlInput, setOfflineFormUrlInput] = useState(offlineFormUrl);
     
     const [newPassword, setNewPassword] = useState('');
     const [contactForm, setContactForm] = useState(contactInfo);
@@ -64,10 +66,11 @@ const AdminDashboard: React.FC = () => {
         setLogoUrlInput(logoUrl);
         setBannerUrlInput(bannerUrl);
         setJuknisUrlInput(juknisUrl);
+        setOfflineFormUrlInput(offlineFormUrl);
         setContactForm(contactInfo);
         setSocialForm(socialLinks);
         setTursoForm(tursoConfig);
-    }, [registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, contactInfo, socialLinks, tursoConfig]);
+    }, [registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, offlineFormUrl, contactInfo, socialLinks, tursoConfig]);
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -218,6 +221,7 @@ const AdminDashboard: React.FC = () => {
         updateLogoUrl(logoUrlInput);
         updateBannerUrl(bannerUrlInput);
         updateJuknisUrl(juknisUrlInput);
+        updateOfflineFormUrl(offlineFormUrlInput);
         updateContactInfo(contactForm);
         updateSocialLinks(socialForm);
         updateTursoConfig(tursoForm);
@@ -235,6 +239,7 @@ const AdminDashboard: React.FC = () => {
             logoUrl: logoUrlInput,
             bannerUrl: bannerUrlInput,
             juknisUrl: juknisUrlInput,
+            offlineFormUrl: offlineFormUrlInput,
             contactInfo: contactForm,
             socialLinks: socialForm,
             tursoConfig: tursoForm,
@@ -549,16 +554,29 @@ const AdminDashboard: React.FC = () => {
                                         className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Link Master Juknis (Google Drive)</label>
-                                    <input 
-                                        type="text"
-                                        value={juknisUrlInput} 
-                                        onChange={(e) => setJuknisUrlInput(e.target.value)}
-                                        placeholder="https://drive.google.com/drive/folders/..."
-                                        className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                                    />
-                                    <p className="text-xs text-slate-500 mt-1">Jika diisi, tombol 'Lihat Seluruh Juknis' akan muncul di halaman Juknis.</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                     <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Link Master Juknis (Google Drive)</label>
+                                        <input 
+                                            type="text"
+                                            value={juknisUrlInput} 
+                                            onChange={(e) => setJuknisUrlInput(e.target.value)}
+                                            placeholder="https://drive.google.com/drive/folders/..."
+                                            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                                        />
+                                        <p className="text-xs text-slate-500 mt-1">Muncul sebagai tombol 'Buka Folder Juknis'.</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">Link Formulir Offline (PDF/Doc)</label>
+                                        <input 
+                                            type="text"
+                                            value={offlineFormUrlInput} 
+                                            onChange={(e) => setOfflineFormUrlInput(e.target.value)}
+                                            placeholder="https://drive.google.com/file/..."
+                                            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                                        />
+                                        <p className="text-xs text-slate-500 mt-1">Muncul sebagai tombol 'Download Formulir' di halaman Juknis.</p>
+                                    </div>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
