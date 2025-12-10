@@ -1,0 +1,293 @@
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { EventData, Category, JuknisItem, FaqItem, DataContextType, Participant, RegistrationFormData, ContactInfo, SocialLinks } from '../types';
+
+const STORAGE_KEY = 'SGC_APP_DATA_V2'; // Bumped version to ensure clean slate or migration
+
+// Initial Mock Data updated for SGC 2026
+const INITIAL_EVENTS: EventData[] = [
+  {
+    id: '1',
+    title: 'Tryout TKA + IPAS',
+    category: Category.ACADEMIC,
+    date: 'Minggu, 7 Februari 2026',
+    time: '08:00 WIB',
+    location: 'SMP Negeri 1 Genteng',
+    fee: 'Rp 50.000',
+    description: 'Simulasi Tes Kemampuan Akademik (Bhs. Indonesia, Matematika, IPAS) untuk persiapan jenjang selanjutnya.',
+    iconName: 'BookOpen',
+    details: ['Materi: B. Indo, MTK, IPAS', 'Minggu, 7 Februari 2026', 'Rp 50.000 / Peserta']
+  },
+  {
+    id: '2',
+    title: 'Olimpiade MIPA',
+    category: Category.ACADEMIC,
+    date: 'Sabtu, 6 Februari 2026',
+    time: '07:30 WIB',
+    location: 'SMP Negeri 1 Genteng',
+    fee: 'Rp 65.000',
+    description: 'Kompetisi Matematika dan IPA tingkat SD/MI. Uji kemampuan logikamu di sini!',
+    iconName: 'Calculator',
+    details: ['Sabtu, 6 Februari 2026', 'Rp 65.000 / Peserta', 'Piala & Uang Pembinaan']
+  },
+  {
+    id: '3',
+    title: 'Olimpiade Bahasa Inggris',
+    category: Category.ACADEMIC,
+    date: 'Sabtu, 6 Februari 2026',
+    time: '09:00 WIB',
+    location: 'SMP Negeri 1 Genteng',
+    fee: 'Rp 65.000',
+    description: 'Tunjukkan kemampuan Bahasa Inggrismu dalam ajang bergengsi ini.',
+    iconName: 'Globe',
+    details: ['Sabtu, 6 Februari 2026', 'Rp 65.000 / Peserta', 'Sertifikat & Doorprize']
+  },
+  {
+    id: '4',
+    title: 'Lomba Gambar Bercerita',
+    category: Category.CREATIVE,
+    date: 'Sabtu, 6 Februari 2026',
+    time: '08:00 WIB',
+    location: 'SMP Negeri 1 Genteng',
+    fee: 'Rp 50.000',
+    description: 'Tuangkan imajinasimu dalam gambar yang bercerita.',
+    iconName: 'Pencil',
+    details: ['Sabtu, 6 Februari 2026', 'Rp 50.000 / Peserta', 'Tema Kreatif']
+  },
+  {
+    id: '5',
+    title: 'Lomba Mewarnai',
+    category: Category.CREATIVE,
+    date: 'Sabtu, 6 Februari 2026',
+    time: '08:30 WIB',
+    location: 'SMP Negeri 1 Genteng',
+    fee: 'Rp 50.000',
+    description: 'Khusus untuk adik-adik yang gemar mewarnai. Salurkan bakat senimu!',
+    iconName: 'Palette',
+    details: ['Sabtu, 6 Februari 2026', 'Rp 50.000 / Peserta', 'Hadiah Menarik']
+  },
+];
+
+const INITIAL_JUKNIS: JuknisItem[] = [
+    {
+        id: '1',
+        title: 'Buku Panduan SGC 2026',
+        description: 'Panduan lengkap seluruh cabang lomba, tata tertib, dan teknis pelaksanaan SGC 2026.',
+        downloadUrl: '#'
+    },
+    {
+        id: '2',
+        title: 'Formulir Pendaftaran Offline',
+        description: 'Bagi peserta yang mendaftar secara kolektif via sekolah, formulir dapat diunduh di sini.',
+        downloadUrl: '#'
+    }
+];
+
+const INITIAL_FAQS: FaqItem[] = [
+    {
+        id: '1',
+        question: 'Kapan pendaftaran dibuka?',
+        answer: 'Pendaftaran dibuka mulai 8 Desember sampai dengan 2 Februari 2026. Segera daftar sebelum kuota terpenuhi!'
+    },
+    {
+        id: '2',
+        question: 'Bagaimana cara pembayarannya?',
+        answer: 'Pembayaran ditransfer ke Bank Jatim No. Rek 0553010420 a.n. Lailatul Zuhro.'
+    },
+    {
+        id: '3',
+        question: 'Apa saja fasilitas yang didapat?',
+        answer: 'Peserta mendapatkan Sertifikat Peserta, berkesempatan memenangkan Trofi Juara, Uang Pembinaan, dan Doorprize (Total hadiah jutaan rupiah).'
+    },
+    {
+        id: '4',
+        question: 'Siapa yang bisa mendaftar?',
+        answer: 'Siswa SD / MI Sederajat Tahun Pelajaran 2025/2026.'
+    }
+];
+
+const INITIAL_PARTICIPANTS: Participant[] = [];
+const INITIAL_REGISTRATION_URL = '#';
+const INITIAL_PUBLIC_PARTICIPANTS_URL = '';
+const INITIAL_BROCHURE_URL = '#';
+const INITIAL_LOGO_URL = '';
+const INITIAL_BANNER_URL = 'https://drive.google.com/thumbnail?id=1wAHp_r0aMa743kUnzGN0uAVApl5RHmJh&sz=w1920&v=2'; // Default Banner
+const INITIAL_ADMIN_PASSWORD = 'admin123';
+
+const INITIAL_CONTACT_INFO: ContactInfo = {
+    address: 'Jl. Bromo No. 49 Genteng - Banyuwangi',
+    phone1: '0819-3695-1078 (Rizki Murni)',
+    phone2: '0819-3695-1078 (Lutfhia Laili)',
+    email: 'panitia@sgc-spensa.sch.id'
+};
+
+const INITIAL_SOCIAL_LINKS: SocialLinks = {
+    instagram: 'https://instagram.com/smpnegeri1genteng',
+    facebook: 'https://facebook.com/smpn1genteng'
+};
+
+const DataContext = createContext<DataContextType | undefined>(undefined);
+
+export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    // Load initial state from local storage or fall back to defaults
+    const loadState = () => {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            return saved ? JSON.parse(saved) : null;
+        } catch (e) {
+            console.error("Failed to load state", e);
+            return null;
+        }
+    };
+
+    const savedState = loadState();
+
+    const [events, setEvents] = useState<EventData[]>(savedState?.events || INITIAL_EVENTS);
+    const [juknisList, setJuknisList] = useState<JuknisItem[]>(savedState?.juknisList || INITIAL_JUKNIS);
+    const [faqs, setFaqs] = useState<FaqItem[]>(savedState?.faqs || INITIAL_FAQS);
+    const [participants, setParticipants] = useState<Participant[]>(savedState?.participants || INITIAL_PARTICIPANTS);
+    
+    // Config URLs
+    const [registrationUrl, setRegistrationUrl] = useState<string>(savedState?.registrationUrl || INITIAL_REGISTRATION_URL);
+    const [publicParticipantsUrl, setPublicParticipantsUrl] = useState<string>(savedState?.publicParticipantsUrl || INITIAL_PUBLIC_PARTICIPANTS_URL);
+    const [brochureUrl, setBrochureUrl] = useState<string>(savedState?.brochureUrl || INITIAL_BROCHURE_URL);
+    const [logoUrl, setLogoUrl] = useState<string>(savedState?.logoUrl || INITIAL_LOGO_URL);
+    const [bannerUrl, setBannerUrl] = useState<string>(savedState?.bannerUrl || INITIAL_BANNER_URL);
+    
+    // Settings
+    const [adminPassword, setAdminPassword] = useState<string>(savedState?.adminPassword || INITIAL_ADMIN_PASSWORD);
+    const [contactInfo, setContactInfo] = useState<ContactInfo>(savedState?.contactInfo || INITIAL_CONTACT_INFO);
+    const [socialLinks, setSocialLinks] = useState<SocialLinks>(savedState?.socialLinks || INITIAL_SOCIAL_LINKS);
+
+    // Persist to local storage whenever state changes
+    useEffect(() => {
+        try {
+            const stateToSave = { 
+                events, juknisList, faqs, participants, 
+                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl,
+                adminPassword, contactInfo, socialLinks
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+        } catch (e) {
+            console.error("Failed to save state", e);
+        }
+    }, [events, juknisList, faqs, participants, registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, adminPassword, contactInfo, socialLinks]);
+
+    // Reset Data Function
+    const resetData = () => {
+        if (window.confirm("PERINGATAN: Apakah Anda yakin ingin mereset seluruh data sistem? Semua data peserta, konten, dan password admin akan kembali ke default.")) {
+            localStorage.removeItem(STORAGE_KEY);
+            setEvents(INITIAL_EVENTS);
+            setJuknisList(INITIAL_JUKNIS);
+            setFaqs(INITIAL_FAQS);
+            setParticipants(INITIAL_PARTICIPANTS);
+            setRegistrationUrl(INITIAL_REGISTRATION_URL);
+            setPublicParticipantsUrl(INITIAL_PUBLIC_PARTICIPANTS_URL);
+            setBrochureUrl(INITIAL_BROCHURE_URL);
+            setLogoUrl(INITIAL_LOGO_URL);
+            setBannerUrl(INITIAL_BANNER_URL);
+            setAdminPassword(INITIAL_ADMIN_PASSWORD);
+            setContactInfo(INITIAL_CONTACT_INFO);
+            setSocialLinks(INITIAL_SOCIAL_LINKS);
+            alert("Sistem berhasil direset ke pengaturan awal.");
+        }
+    };
+
+    // Event Actions
+    const updateEvent = (updatedEvent: EventData) => {
+        setEvents(prev => prev.map(e => e.id === updatedEvent.id ? updatedEvent : e));
+    };
+
+    const addEvent = (newEvent: EventData) => {
+        setEvents(prev => [...prev, newEvent]);
+    };
+
+    const deleteEvent = (id: string) => {
+        setEvents(prev => prev.filter(e => e.id !== id));
+    };
+
+    // Juknis Actions
+    const updateJuknis = (updatedJuknis: JuknisItem) => {
+        setJuknisList(prev => prev.map(j => j.id === updatedJuknis.id ? updatedJuknis : j));
+    };
+
+    const addJuknis = (newJuknis: JuknisItem) => {
+        setJuknisList(prev => [...prev, newJuknis]);
+    };
+
+    const deleteJuknis = (id: string) => {
+        setJuknisList(prev => prev.filter(j => j.id !== id));
+    };
+
+    // FAQ Actions
+    const updateFaq = (updatedFaq: FaqItem) => {
+        setFaqs(prev => prev.map(f => f.id === updatedFaq.id ? updatedFaq : f));
+    };
+
+    const addFaq = (newFaq: FaqItem) => {
+        setFaqs(prev => [...prev, newFaq]);
+    };
+
+    const deleteFaq = (id: string) => {
+        setFaqs(prev => prev.filter(f => f.id !== id));
+    };
+
+    // Participant Actions
+    const registerParticipant = (data: RegistrationFormData) => {
+        const newParticipant: Participant = {
+            id: Date.now().toString(),
+            fullName: data.fullName,
+            schoolOrigin: data.schoolOrigin,
+            grade: data.grade,
+            parentName: data.parentName,
+            whatsappNumber: data.whatsappNumber,
+            selectedEvent: data.selectedEvent,
+            status: 'pending',
+            registrationDate: new Date().toISOString().split('T')[0],
+            hasPaymentProof: !!data.paymentProof
+        };
+        setParticipants(prev => [...prev, newParticipant]);
+        console.log("Registered:", newParticipant);
+    };
+
+    const updateParticipantStatus = (id: string, status: 'pending' | 'verified' | 'rejected') => {
+        setParticipants(prev => prev.map(p => p.id === id ? { ...p, status } : p));
+    };
+    
+    // URL Actions
+    const updateRegistrationUrl = (url: string) => setRegistrationUrl(url);
+    const updatePublicParticipantsUrl = (url: string) => setPublicParticipantsUrl(url);
+    const updateBrochureUrl = (url: string) => setBrochureUrl(url);
+    const updateLogoUrl = (url: string) => setLogoUrl(url);
+    const updateBannerUrl = (url: string) => setBannerUrl(url);
+    
+    // Settings Actions
+    const updateAdminPassword = (password: string) => setAdminPassword(password);
+    const updateContactInfo = (info: ContactInfo) => setContactInfo(info);
+    const updateSocialLinks = (links: SocialLinks) => setSocialLinks(links);
+
+    return (
+        <DataContext.Provider value={{ 
+            events, juknisList, faqs, participants, 
+            registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl,
+            adminPassword, contactInfo, socialLinks,
+            
+            updateEvent, addEvent, deleteEvent,
+            updateJuknis, addJuknis, deleteJuknis,
+            updateFaq, addFaq, deleteFaq,
+            registerParticipant, updateParticipantStatus,
+            updateRegistrationUrl, updatePublicParticipantsUrl, updateBrochureUrl, updateLogoUrl, updateBannerUrl,
+            updateAdminPassword, updateContactInfo, updateSocialLinks,
+            resetData
+        }}>
+            {children}
+        </DataContext.Provider>
+    );
+};
+
+export const useData = () => {
+    const context = useContext(DataContext);
+    if (context === undefined) {
+        throw new Error('useData must be used within a DataProvider');
+    }
+    return context;
+};
