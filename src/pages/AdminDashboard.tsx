@@ -20,7 +20,6 @@ const AdminDashboard: React.FC = () => {
         brochureUrl, updateBrochureUrl,
         logoUrl, updateLogoUrl,
         bannerUrl, updateBannerUrl,
-        juknisUrl, updateJuknisUrl,
         adminPassword, updateAdminPassword,
         contactInfo, updateContactInfo,
         socialLinks, updateSocialLinks,
@@ -41,7 +40,6 @@ const AdminDashboard: React.FC = () => {
     const [brochureUrlInput, setBrochureUrlInput] = useState(brochureUrl);
     const [logoUrlInput, setLogoUrlInput] = useState(logoUrl);
     const [bannerUrlInput, setBannerUrlInput] = useState(bannerUrl);
-    const [juknisUrlInput, setJuknisUrlInput] = useState(juknisUrl);
     
     const [newPassword, setNewPassword] = useState('');
     const [contactForm, setContactForm] = useState(contactInfo);
@@ -57,11 +55,10 @@ const AdminDashboard: React.FC = () => {
         setBrochureUrlInput(brochureUrl);
         setLogoUrlInput(logoUrl);
         setBannerUrlInput(bannerUrl);
-        setJuknisUrlInput(juknisUrl);
         setContactForm(contactInfo);
         setSocialForm(socialLinks);
         setTursoForm(tursoConfig);
-    }, [registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, contactInfo, socialLinks, tursoConfig]);
+    }, [registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, contactInfo, socialLinks, tursoConfig]);
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -190,7 +187,6 @@ const AdminDashboard: React.FC = () => {
         updateBrochureUrl(brochureUrlInput);
         updateLogoUrl(logoUrlInput);
         updateBannerUrl(bannerUrlInput);
-        updateJuknisUrl(juknisUrlInput);
         updateContactInfo(contactForm);
         updateSocialLinks(socialForm);
         updateTursoConfig(tursoForm);
@@ -206,7 +202,6 @@ const AdminDashboard: React.FC = () => {
             brochureUrl: brochureUrlInput,
             logoUrl: logoUrlInput,
             bannerUrl: bannerUrlInput,
-            juknisUrl: juknisUrlInput,
             contactInfo: contactForm,
             socialLinks: socialForm,
             tursoConfig: tursoForm,
@@ -247,6 +242,7 @@ const AdminDashboard: React.FC = () => {
             </aside>
             <main className="flex-1 p-4 md:p-8 overflow-y-auto w-full">
                 <h1 className="text-3xl font-bold text-slate-800 mb-8 capitalize">{activeTab === 'database' ? 'Database & Integrasi' : `Manage ${activeTab}`}</h1>
+                
                 {activeTab === 'events' && (
                     <div className="space-y-8">
                         <button onClick={openAddModal} className="bg-primary-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-700 flex items-center gap-2 shadow-lg"><Plus size={18} /> Tambah Event</button>
@@ -260,99 +256,114 @@ const AdminDashboard: React.FC = () => {
                         </div>
                     </div>
                 )}
-                {activeTab === 'database' && (
-                    <div className="space-y-8 max-w-4xl">
-                         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                            <h3 className="font-bold text-lg mb-6 flex items-center gap-2 text-slate-800 border-b pb-4"><Database size={20} className="text-primary-600" /> Konfigurasi Database Turso</h3>
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6"><div className="flex items-start gap-3"><AlertTriangle className="text-blue-600 mt-0.5 shrink-0" size={20} /><div><h4 className="font-bold text-blue-800 text-sm">Penyimpanan Awan (Cloud Storage)</h4><p className="text-sm text-blue-700 mt-1">Fitur ini memungkinkan data website disimpan di database cloud Turso.</p></div></div></div>
-                            <div className="space-y-6">
-                                <div className="flex items-center gap-3 mb-4"><label className="relative inline-flex items-center cursor-pointer"><input type="checkbox" className="sr-only peer" checked={tursoForm.enabled} onChange={(e) => setTursoForm({...tursoForm, enabled: e.target.checked})} /><div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div><span className="ml-3 text-sm font-medium text-slate-900">Aktifkan Sinkronisasi Turso</span></label></div>
-                                <div className={!tursoForm.enabled ? 'opacity-50 pointer-events-none' : ''}>
-                                    <div className="mb-4"><label className="block text-sm font-medium text-slate-700 mb-2">Database URL</label><input type="text" value={tursoForm.dbUrl} onChange={(e) => setTursoForm({...tursoForm, dbUrl: e.target.value})} placeholder="libsql://..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-mono text-sm" /></div>
-                                    <div className="mb-6"><label className="block text-sm font-medium text-slate-700 mb-2">Auth Token</label><textarea value={tursoForm.authToken} onChange={(e) => setTursoForm({...tursoForm, authToken: e.target.value})} placeholder="ey..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 font-mono text-sm h-24" /></div>
-                                    <div className="flex items-center gap-4"><button onClick={handleTestTurso} disabled={isTestingTurso} className="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-2 disabled:opacity-70">{isTestingTurso ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle size={16} />} Test Koneksi</button><button onClick={handleInitTurso} disabled={isTestingTurso} className="px-4 py-2 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors flex items-center gap-2 disabled:opacity-70"><Database size={16} /> Buat Tabel / Inisialisasi</button>{tursoStatus === 'success' && <span className="text-green-600 font-bold text-sm flex items-center gap-1"><CheckCircle size={16} /> Terhubung!</span>}{tursoStatus === 'error' && <span className="text-red-600 font-bold text-sm flex items-center gap-1"><X size={16} /> Gagal Terhubung</span>}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="sticky bottom-0 bg-slate-50 pt-4 pb-8"><button onClick={handleSaveSettings} className="w-full bg-primary-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30 flex items-center justify-center gap-2"><Save size={20} /> Simpan & Sinkronisasi</button></div>
-                    </div>
-                )}
-                {activeTab === 'juknis' && (
-                    <div className="space-y-8">
-                         <button onClick={openAddModal} className="bg-primary-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-700 flex items-center gap-2 shadow-lg"><Plus size={18} /> Tambah Juknis</button>
-                         <div className="space-y-4">
-                            {juknisList.map(item => (
-                                <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div className="flex-1"><h4 className="font-bold text-lg">{item.title}</h4><p className="text-sm text-slate-500">{item.description}</p><p className="text-xs text-primary-500 truncate max-w-md">{item.downloadUrl}</p></div>
-                                    <div className="flex gap-2"><button onClick={() => openEditModal(item.id, item)} className="text-blue-500 hover:bg-blue-50 p-2 rounded"><Edit2 size={20} /></button><button onClick={() => deleteJuknis(item.id)} className="text-red-500 hover:bg-red-50 p-2 rounded"><Trash2 size={20} /></button></div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-                {activeTab === 'faq' && (
-                    <div className="space-y-8">
-                         <button onClick={openAddModal} className="bg-primary-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-700 flex items-center gap-2 shadow-lg"><Plus size={18} /> Tambah FAQ</button>
-                        <div className="space-y-4">
-                            {faqs.map(item => (
-                                <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div className="flex-1"><h4 className="font-bold text-lg">{item.question}</h4><p className="text-sm text-slate-500 line-clamp-2">{item.answer}</p></div>
-                                    <div className="flex gap-2"><button onClick={() => openEditModal(item.id, item)} className="text-blue-500 hover:bg-blue-50 p-2 rounded"><Edit2 size={20} /></button><button onClick={() => deleteFaq(item.id)} className="text-red-500 hover:bg-red-50 p-2 rounded"><Trash2 size={20} /></button></div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+
                 {activeTab === 'settings' && (
                     <div className="space-y-8 max-w-4xl">
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                             <h3 className="font-bold text-lg mb-6 flex items-center gap-2 text-slate-800 border-b pb-4"><ExternalLink size={20} className="text-primary-600" /> Pengaturan Link & Aset</h3>
                             <div className="grid grid-cols-1 gap-6">
                                 <div><label className="block text-sm font-medium text-slate-700 mb-2">Google Form Pendaftaran URL</label><input type="text" value={urlInput} onChange={(e) => setUrlInput(e.target.value)} placeholder="https://docs.google.com/forms/..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
-                                <div><label className="block text-sm font-medium text-slate-700 mb-2">Brochure / Flyer Download URL</label><input type="text" value={brochureUrlInput} onChange={(e) => setBrochureUrlInput(e.target.value)} placeholder="https://drive.google.com/..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
-                                <div><label className="block text-sm font-medium text-slate-700 mb-2">Public Participant Sheet / Embed URL</label><input type="text" value={sheetUrlInput} onChange={(e) => setSheetUrlInput(e.target.value)} placeholder="https://docs.google.com/spreadsheets/..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
-                                <div><label className="block text-sm font-medium text-slate-700 mb-2">Link Master Juknis (Google Drive)</label><input type="text" value={juknisUrlInput} onChange={(e) => setJuknisUrlInput(e.target.value)} placeholder="https://drive.google.com/drive/folders/..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /><p className="text-xs text-slate-500 mt-1">Muncul sebagai tombol 'Buka Folder Juknis'.</p></div>
+                                <div><label className="block text-sm font-medium text-slate-700 mb-2">Download Brosur/Banner URL</label><input type="text" value={brochureUrlInput} onChange={(e) => setBrochureUrlInput(e.target.value)} placeholder="https://drive.google.com/..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
+                                <div><label className="block text-sm font-medium text-slate-700 mb-2">Link Daftar Peserta (Public Sheet URL)</label><input type="text" value={sheetUrlInput} onChange={(e) => setSheetUrlInput(e.target.value)} placeholder="https://docs.google.com/spreadsheets/..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div><label className="block text-sm font-medium text-slate-700 mb-2 flex items-center gap-2"><Image size={16} /> Logo URL</label><input type="text" value={logoUrlInput} onChange={(e) => setLogoUrlInput(e.target.value)} placeholder="https://drive.google.com/file/d/..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /><p className="text-xs text-slate-500 mt-1">Mendukung link Google Drive.</p></div>
-                                    <div><label className="block text-sm font-medium text-slate-700 mb-2 flex items-center gap-2"><Image size={16} /> Banner Image URL</label><input type="text" value={bannerUrlInput} onChange={(e) => setBannerUrlInput(e.target.value)} placeholder="https://drive.google.com/file/d/..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /><p className="text-xs text-slate-500 mt-1">Mendukung link Google Drive.</p></div>
+                                    <div><label className="block text-sm font-medium text-slate-700 mb-2 flex items-center gap-2"><Image size={16} /> Logo URL</label><input type="text" value={logoUrlInput} onChange={(e) => setLogoUrlInput(e.target.value)} placeholder="https://drive.google.com/file/d/..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
+                                    <div><label className="block text-sm font-medium text-slate-700 mb-2 flex items-center gap-2"><Image size={16} /> Banner Image URL</label><input type="text" value={bannerUrlInput} onChange={(e) => setBannerUrlInput(e.target.value)} placeholder="https://drive.google.com/file/d/..." className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                            <h3 className="font-bold text-lg mb-6 flex items-center gap-2 text-slate-800 border-b pb-4"><Phone size={20} className="text-primary-600" /> Kontak & Informasi</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div className="md:col-span-2"><label className="block text-sm font-medium text-slate-700 mb-2">Alamat Lengkap</label><input type="text" value={contactForm.address} onChange={(e) => setContactForm({...contactForm, address: e.target.value})} className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
-                                <div><label className="block text-sm font-medium text-slate-700 mb-2">Email</label><input type="email" value={contactForm.email} onChange={(e) => setContactForm({...contactForm, email: e.target.value})} className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
-                                <div><label className="block text-sm font-medium text-slate-700 mb-2">Nomor HP 1</label><input type="text" value={contactForm.phone1} onChange={(e) => setContactForm({...contactForm, phone1: e.target.value})} className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
-                                <div><label className="block text-sm font-medium text-slate-700 mb-2">Nomor HP 2</label><input type="text" value={contactForm.phone2} onChange={(e) => setContactForm({...contactForm, phone2: e.target.value})} className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
-                            </div>
-                            <h4 className="font-bold text-sm text-slate-600 mb-4 uppercase tracking-wide">Social Media Links</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div><label className="block text-sm font-medium text-slate-700 mb-2">Instagram URL</label><input type="text" value={socialForm.instagram} onChange={(e) => setSocialForm({...socialForm, instagram: e.target.value})} className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
-                                <div><label className="block text-sm font-medium text-slate-700 mb-2">Facebook URL</label><input type="text" value={socialForm.facebook} onChange={(e) => setSocialForm({...socialForm, facebook: e.target.value})} className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500" /></div>
-                            </div>
-                        </div>
+
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                              <h3 className="font-bold text-lg mb-6 flex items-center gap-2 text-slate-800 border-b pb-4"><Lock size={20} className="text-primary-600" /> Keamanan Akun</h3>
-                            <div><label className="block text-sm font-medium text-slate-700 mb-2">Ganti Password Admin</label><input type="text" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Masukkan password baru" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 bg-slate-50" /><p className="text-xs text-slate-500 mt-2">Password minimal 6 karakter disarankan.</p></div>
+                            <div><label className="block text-sm font-medium text-slate-700 mb-2">Ganti Password Admin</label><input type="text" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Masukkan password baru" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 bg-slate-50" /></div>
                         </div>
+
                         <div className="sticky bottom-0 bg-slate-50 pt-4 pb-8"><button onClick={handleSaveSettings} className="w-full bg-primary-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30 flex items-center justify-center gap-2"><Save size={20} /> Simpan Semua Pengaturan</button></div>
                     </div>
                 )}
+                
+                {activeTab === 'juknis' && (
+                    <div className="space-y-8">
+                         <button onClick={openAddModal} className="bg-primary-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-700 flex items-center gap-2 shadow-lg"><Plus size={18} /> Tambah Juknis</button>
+                         <div className="space-y-4">
+                            {juknisList.map(item => (
+                                <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                    <div className="flex-1">
+                                        <h4 className="font-bold text-lg">{item.title}</h4>
+                                        <p className="text-sm text-slate-500">{item.description}</p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => openEditModal(item.id, item)} className="text-blue-500 hover:bg-blue-50 p-2 rounded"><Edit2 size={20} /></button>
+                                        <button onClick={() => deleteJuknis(item.id)} className="text-red-500 hover:bg-red-50 p-2 rounded"><Trash2 size={20} /></button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'faq' && (
+                    <div className="space-y-8">
+                         <button onClick={openAddModal} className="bg-primary-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-700 flex items-center gap-2 shadow-lg"><Plus size={18} /> Tambah FAQ</button>
+                        <div className="space-y-4">
+                            {faqs.map(item => (
+                                <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                    <div className="flex-1">
+                                        <h4 className="font-bold text-lg">{item.question}</h4>
+                                        <p className="text-sm text-slate-500 line-clamp-2">{item.answer}</p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => openEditModal(item.id, item)} className="text-blue-500 hover:bg-blue-50 p-2 rounded"><Edit2 size={20} /></button>
+                                        <button onClick={() => deleteFaq(item.id)} className="text-red-500 hover:bg-red-50 p-2 rounded"><Trash2 size={20} /></button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </main>
+
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10"><h3 className="text-lg font-bold">{modalMode === 'add' ? 'Tambah Data' : 'Edit Data'} - {activeTab.toUpperCase()}</h3><button onClick={closeModal} className="text-slate-400 hover:text-slate-600"><X size={24} /></button></div>
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
+                            <h3 className="text-lg font-bold">
+                                {modalMode === 'add' ? 'Tambah Data' : 'Edit Data'}
+                            </h3>
+                            <button onClick={closeModal} className="text-slate-400 hover:text-slate-600">
+                                <X size={24} />
+                            </button>
+                        </div>
+                        
                         <div className="p-6 space-y-4">
                             {activeTab === 'events' && (
-                                <><input placeholder="Judul Event" className="w-full p-3 border rounded-lg" value={newEvent.title || ''} onChange={e => setNewEvent({...newEvent, title: e.target.value})} /><div className="grid grid-cols-2 gap-4"><select className="p-3 border rounded-lg" value={newEvent.category} onChange={e => setNewEvent({...newEvent, category: e.target.value as Category})}><option value={Category.ACADEMIC}>Akademik</option><option value={Category.CREATIVE}>Kreatif</option></select><input placeholder="Biaya" className="p-3 border rounded-lg" value={newEvent.fee || ''} onChange={e => setNewEvent({...newEvent, fee: e.target.value})} /></div><input placeholder="Tanggal" className="w-full p-3 border rounded-lg" value={newEvent.date || ''} onChange={e => setNewEvent({...newEvent, date: e.target.value})} /><input placeholder="Waktu" className="w-full p-3 border rounded-lg" value={newEvent.time || ''} onChange={e => setNewEvent({...newEvent, time: e.target.value})} /><input placeholder="Lokasi" className="w-full p-3 border rounded-lg" value={newEvent.location || ''} onChange={e => setNewEvent({...newEvent, location: e.target.value})} /><textarea placeholder="Deskripsi Singkat" className="w-full p-3 border rounded-lg h-24" value={newEvent.description || ''} onChange={e => setNewEvent({...newEvent, description: e.target.value})} /><button onClick={handleSaveEvent} className="w-full bg-primary-600 text-white py-3 rounded-lg font-bold hover:bg-primary-700">Simpan Event</button></>
+                                <>
+                                    <input placeholder="Judul Event" className="w-full p-3 border rounded-lg" value={newEvent.title || ''} onChange={e => setNewEvent({...newEvent, title: e.target.value})} />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <select className="p-3 border rounded-lg" value={newEvent.category} onChange={e => setNewEvent({...newEvent, category: e.target.value as Category})}>
+                                            <option value={Category.ACADEMIC}>Akademik</option>
+                                            <option value={Category.CREATIVE}>Kreatif</option>
+                                        </select>
+                                        <input placeholder="Biaya" className="p-3 border rounded-lg" value={newEvent.fee || ''} onChange={e => setNewEvent({...newEvent, fee: e.target.value})} />
+                                    </div>
+                                    <input placeholder="Tanggal" className="w-full p-3 border rounded-lg" value={newEvent.date || ''} onChange={e => setNewEvent({...newEvent, date: e.target.value})} />
+                                    <textarea placeholder="Deskripsi Singkat" className="w-full p-3 border rounded-lg h-24" value={newEvent.description || ''} onChange={e => setNewEvent({...newEvent, description: e.target.value})} />
+                                    <button onClick={handleSaveEvent} className="w-full bg-primary-600 text-white py-3 rounded-lg font-bold hover:bg-primary-700">Simpan Event</button>
+                                </>
                             )}
                             {activeTab === 'juknis' && (
-                                <><input placeholder="Judul Dokumen" className="w-full p-3 border rounded-lg" value={newJuknis.title || ''} onChange={e => setNewJuknis({...newJuknis, title: e.target.value})} /><textarea placeholder="Deskripsi Singkat" className="w-full p-3 border rounded-lg h-20" value={newJuknis.description || ''} onChange={e => setNewJuknis({...newJuknis, description: e.target.value})} /><div className="space-y-1"><label className="text-xs font-bold text-slate-500 uppercase">Link File / Download</label><input placeholder="https://drive.google.com/..." className="w-full p-3 border rounded-lg" value={newJuknis.downloadUrl || ''} onChange={e => setNewJuknis({...newJuknis, downloadUrl: e.target.value})} /></div><button onClick={handleSaveJuknis} className="w-full bg-primary-600 text-white py-3 rounded-lg font-bold hover:bg-primary-700">Simpan Juknis</button></>
+                                <>
+                                    <input placeholder="Judul Juknis" className="w-full p-3 border rounded-lg" value={newJuknis.title || ''} onChange={e => setNewJuknis({...newJuknis, title: e.target.value})} />
+                                    <textarea placeholder="Deskripsi Singkat" className="w-full p-3 border rounded-lg h-24" value={newJuknis.description || ''} onChange={e => setNewJuknis({...newJuknis, description: e.target.value})} />
+                                    <input placeholder="Link Download" className="w-full p-3 border rounded-lg" value={newJuknis.downloadUrl || ''} onChange={e => setNewJuknis({...newJuknis, downloadUrl: e.target.value})} />
+                                    <button onClick={handleSaveJuknis} className="w-full bg-primary-600 text-white py-3 rounded-lg font-bold hover:bg-primary-700">Simpan Juknis</button>
+                                </>
                             )}
-                            {activeTab === 'faq' && (
-                                <><input placeholder="Pertanyaan" className="w-full p-3 border rounded-lg" value={newFaq.question || ''} onChange={e => setNewFaq({...newFaq, question: e.target.value})} /><textarea placeholder="Jawaban" className="w-full p-3 border rounded-lg h-32" value={newFaq.answer || ''} onChange={e => setNewFaq({...newFaq, answer: e.target.value})} /><button onClick={handleSaveFaq} className="w-full bg-primary-600 text-white py-3 rounded-lg font-bold hover:bg-primary-700">Simpan FAQ</button></>
+                             {activeTab === 'faq' && (
+                                <>
+                                    <input placeholder="Pertanyaan" className="w-full p-3 border rounded-lg" value={newFaq.question || ''} onChange={e => setNewFaq({...newFaq, question: e.target.value})} />
+                                    <textarea placeholder="Jawaban" className="w-full p-3 border rounded-lg h-32" value={newFaq.answer || ''} onChange={e => setNewFaq({...newFaq, answer: e.target.value})} />
+                                    <button onClick={handleSaveFaq} className="w-full bg-primary-600 text-white py-3 rounded-lg font-bold hover:bg-primary-700">Simpan FAQ</button>
+                                </>
                             )}
                         </div>
                     </div>

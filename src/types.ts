@@ -70,7 +70,6 @@ export interface DataContextType {
     brochureUrl: string;
     logoUrl: string;
     bannerUrl: string;
-    juknisUrl: string;
 
     // Settings
     adminPassword: string;
@@ -96,16 +95,14 @@ export interface DataContextType {
     updateBrochureUrl: (url: string) => void;
     updateLogoUrl: (url: string) => void;
     updateBannerUrl: (url: string) => void;
-    updateJuknisUrl: (url: string) => void;
     
     updateAdminPassword: (password: string) => void;
     updateContactInfo: (info: ContactInfo) => void;
     updateSocialLinks: (links: SocialLinks) => void;
     updateTursoConfig: (config: TursoConfig) => void;
 
-    // Registration
+    // Actions
     registerParticipant: (data: RegistrationFormData) => void;
-
     resetData: () => void;
     syncToTurso: (overrideData?: any) => Promise<boolean>;
     testTursoConnection: (config: TursoConfig) => Promise<boolean>;
