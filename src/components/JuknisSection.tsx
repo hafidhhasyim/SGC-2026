@@ -48,7 +48,7 @@ const JuknisSection: React.FC = () => {
                   className="flex items-center gap-2 bg-secondary-500 hover:bg-secondary-400 text-slate-900 px-6 py-3 rounded-xl font-bold transition-colors w-full md:w-auto justify-center shadow-lg"
                 >
                   <Download size={20} />
-                  Unduh Juknis
+                  Download Juknis SGC 2026
                 </a>
               </div>
             </div>

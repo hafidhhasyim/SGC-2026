@@ -2,77 +2,76 @@ import React, { createContext, useState, useContext, ReactNode, useEffect } from
 import { EventData, Category, JuknisItem, FaqItem, DataContextType, ContactInfo, SocialLinks, RegistrationFormData, TursoConfig } from '../types';
 import { tursoService } from '../services/tursoService';
 
-const STORAGE_KEY = 'SGC_APP_DATA_V7'; // Bumped version for Offline Form URL
+const STORAGE_KEY = 'SGC_APP_DATA_V9';
 
-// Initial Mock Data updated for SGC 2026
 const INITIAL_EVENTS: EventData[] = [
   {
     id: '1',
-    title: 'Tryout TKA + IPAS',
-    category: Category.ACADEMIC,
-    date: 'Minggu, 7 Februari 2026',
-    time: '08:00 WIB',
-    location: 'SMP Negeri 1 Genteng',
-    fee: 'Rp 50.000',
-    description: 'Simulasi Tes Kemampuan Akademik (Bhs. Indonesia, Matematika, IPAS) untuk persiapan jenjang selanjutnya.',
-    iconName: 'BookOpen',
-    details: ['Materi: B. Indo, MTK, IPAS', 'Minggu, 7 Februari 2026', 'Rp 50.000 / Peserta']
-  },
-  {
-    id: '2',
     title: 'Olimpiade MIPA',
     category: Category.ACADEMIC,
     date: 'Sabtu, 6 Februari 2026',
-    time: '07:30 WIB',
+    time: '07:30 - 12:30 WIB',
     location: 'SMP Negeri 1 Genteng',
     fee: 'Rp 65.000',
-    description: 'Kompetisi Matematika dan IPA tingkat SD/MI. Uji kemampuan logikamu di sini!',
+    description: 'Kompetisi Matematika & IPA. Terdiri dari Babak Penyisihan (Pilihan Ganda) dan Babak Final (Uraian) untuk 20 peserta terbaik.',
     iconName: 'Calculator',
-    details: ['Sabtu, 6 Februari 2026', 'Rp 65.000 / Peserta', 'Piala & Uang Pembinaan']
+    details: ['Penyisihan: 60 Soal (90 Menit)', 'Final: 20 Soal Uraian', 'Biaya: Rp 65.000']
+  },
+  {
+    id: '2',
+    title: 'Olimpiade B. Inggris',
+    category: Category.ACADEMIC,
+    date: 'Sabtu, 6 Februari 2026',
+    time: '09:15 - 13:45 WIB',
+    location: 'SMP Negeri 1 Genteng',
+    fee: 'Rp 65.000',
+    description: 'Uji kemampuan Bahasa Inggris. Babak Penyisihan (60 Soal) dan Final (20 Soal Uraian) untuk memperebutkan juara.',
+    iconName: 'Globe',
+    details: ['Penyisihan: 60 Soal (90 Menit)', 'Final: 20 Soal Uraian', 'Biaya: Rp 65.000']
   },
   {
     id: '3',
-    title: 'Olimpiade Bahasa Inggris',
-    category: Category.ACADEMIC,
+    title: 'Menggambar Bercerita',
+    category: Category.CREATIVE,
     date: 'Sabtu, 6 Februari 2026',
-    time: '09:00 WIB',
+    time: '07:30 - 10:30 WIB',
     location: 'SMP Negeri 1 Genteng',
-    fee: 'Rp 65.000',
-    description: 'Tunjukkan kemampuan Bahasa Inggrismu dalam ajang bergengsi ini.',
-    iconName: 'Globe',
-    details: ['Sabtu, 6 Februari 2026', 'Rp 65.000 / Peserta', 'Sertifikat & Doorprize']
+    fee: 'Rp 50.000',
+    description: 'Tema: "7 Kebiasaan Anak Indonesia Hebat". Peserta kelas 4-6 SD. Wajib membawa meja lipat dan alat gambar sendiri.',
+    iconName: 'Pencil',
+    details: ['Kelas 4, 5, 6 SD', 'Durasi: 3 Jam', 'Media: A4 (Disediakan)']
   },
   {
     id: '4',
-    title: 'Lomba Gambar Bercerita',
-    category: Category.CREATIVE,
-    date: 'Sabtu, 6 Februari 2026',
-    time: '08:00 WIB',
-    location: 'SMP Negeri 1 Genteng',
-    fee: 'Rp 50.000',
-    description: 'Tuangkan imajinasimu dalam gambar yang bercerita.',
-    iconName: 'Pencil',
-    details: ['Sabtu, 6 Februari 2026', 'Rp 50.000 / Peserta', 'Tema Kreatif']
-  },
-  {
-    id: '5',
     title: 'Lomba Mewarnai',
     category: Category.CREATIVE,
     date: 'Sabtu, 6 Februari 2026',
-    time: '08:30 WIB',
+    time: '07:30 - 09:30 WIB',
     location: 'SMP Negeri 1 Genteng',
     fee: 'Rp 50.000',
-    description: 'Khusus untuk adik-adik yang gemar mewarnai. Salurkan bakat senimu!',
+    description: 'Kategori Kelas 1-3 SD. Kriteria: Kerapian, Komposisi Warna, dan Kreativitas. Wajib membawa meja lipat dan tikar.',
     iconName: 'Palette',
-    details: ['Sabtu, 6 Februari 2026', 'Rp 50.000 / Peserta', 'Hadiah Menarik']
+    details: ['Kelas 1, 2, 3 SD', 'Durasi: 2 Jam', 'Wajib bawa meja lipat']
+  },
+  {
+    id: '5',
+    title: 'Try Out SD/MI',
+    category: Category.ACADEMIC,
+    date: 'Minggu, 7 Februari 2026',
+    time: '07:30 - 09:30 WIB',
+    location: 'SMP Negeri 1 Genteng',
+    fee: 'Rp 50.000',
+    description: 'Simulasi ujian dengan 100 Soal (Matematika, IPA, B.Indo, IPS). Durasi 120 menit.',
+    iconName: 'BookOpen',
+    details: ['100 Soal Pilihan Ganda', 'Durasi: 120 Menit', 'Semua Mapel Utama']
   },
 ];
 
 const INITIAL_JUKNIS: JuknisItem[] = [
     {
         id: '1',
-        title: 'Buku Panduan SGC 2026',
-        description: 'Panduan lengkap seluruh cabang lomba, tata tertib, dan teknis pelaksanaan SGC 2026.',
+        title: 'Juknis Lengkap SGC 2026',
+        description: 'Dokumen lengkap berisi tata tertib, silabus materi, dan rundown acara.',
         downloadUrl: 'https://drive.google.com/file/d/1sfm9IZ8sddmHggeykXDhSEhorDMkeORO/view?usp=sharing'
     }
 ];
@@ -80,23 +79,23 @@ const INITIAL_JUKNIS: JuknisItem[] = [
 const INITIAL_FAQS: FaqItem[] = [
     {
         id: '1',
-        question: 'Kapan pendaftaran dibuka?',
-        answer: 'Pendaftaran dibuka mulai 8 Desember sampai dengan 2 Februari 2026. Segera daftar sebelum kuota terpenuhi!'
+        question: 'Kapan pelaksanaan lomba?',
+        answer: 'Lomba dilaksanakan pada 6-7 Februari 2026. Olimpiade & Seni pada hari Sabtu (6 Feb), Try Out pada hari Minggu (7 Feb).'
     },
     {
         id: '2',
-        question: 'Bagaimana cara pembayarannya?',
-        answer: 'Pembayaran ditransfer ke Bank Jatim No. Rek 0553010420 a.n. Lailatul Zuhro.'
+        question: 'Apakah perlengkapan menggambar disediakan?',
+        answer: 'Panitia hanya menyediakan kertas gambar A4. Peserta WAJIB membawa alat gambar, meja lipat, tikar, dan bekal sendiri.'
     },
     {
         id: '3',
-        question: 'Apa saja fasilitas yang didapat?',
-        answer: 'Peserta mendapatkan Sertifikat Peserta, berkesempatan memenangkan Trofi Juara, Uang Pembinaan, dan Doorprize (Total hadiah jutaan rupiah).'
+        question: 'Bagaimana sistem penilaian Olimpiade?',
+        answer: 'Olimpiade menggunakan sistem Benar +4, Salah -1, Kosong 0 pada babak penyisihan. 20 peserta terbaik akan lolos ke babak Final (Uraian).'
     },
     {
         id: '4',
-        question: 'Siapa yang bisa mendaftar?',
-        answer: 'Siswa SD / MI Sederajat Tahun Pelajaran 2025/2026.'
+        question: 'Siapa Contact Person pendaftaran?',
+        answer: 'Riski Murniasih (081 936 951 078) atau Luthfia Laili (082 337 446 950).'
     }
 ];
 
@@ -106,13 +105,12 @@ const INITIAL_BROCHURE_URL = 'https://drive.google.com/file/d/1Y6bQrXLwRZpWAiUoF
 const INITIAL_LOGO_URL = 'https://drive.google.com/file/d/1SnT37ISkjfMT9Nff0WJK3y_O1D40HRFI/view?usp=sharing';
 const INITIAL_BANNER_URL = 'https://drive.google.com/file/d/1wAHp_r0aMa743kUnzGN0uAVApl5RHmJh/view?usp=sharing'; 
 const INITIAL_JUKNIS_URL = 'https://drive.google.com/file/d/1sfm9IZ8sddmHggeykXDhSEhorDMkeORO/view?usp=sharing';
-const INITIAL_OFFLINE_FORM_URL = '#';
 const INITIAL_ADMIN_PASSWORD = 'admin123';
 
 const INITIAL_CONTACT_INFO: ContactInfo = {
     address: 'Jl. Bromo No. 49 Genteng - Banyuwangi',
-    phone1: '0819-3695-1078 (Rizki Murni)',
-    phone2: '0819-3695-1078 (Lutfhia Laili)',
+    phone1: '081 936 951 078 (Riski)',
+    phone2: '082 337 446 950 (Luthfia)',
     email: 'panitia@sgc-spensa.sch.id'
 };
 
@@ -131,7 +129,6 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     
-    // Initial State Loader
     const loadState = () => {
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
@@ -148,47 +145,38 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [juknisList, setJuknisList] = useState<JuknisItem[]>(savedState?.juknisList || INITIAL_JUKNIS);
     const [faqs, setFaqs] = useState<FaqItem[]>(savedState?.faqs || INITIAL_FAQS);
     
-    // Config URLs
     const [registrationUrl, setRegistrationUrl] = useState<string>(savedState?.registrationUrl || INITIAL_REGISTRATION_URL);
     const [publicParticipantsUrl, setPublicParticipantsUrl] = useState<string>(savedState?.publicParticipantsUrl || INITIAL_PUBLIC_PARTICIPANTS_URL);
     const [brochureUrl, setBrochureUrl] = useState<string>(savedState?.brochureUrl || INITIAL_BROCHURE_URL);
     const [logoUrl, setLogoUrl] = useState<string>(savedState?.logoUrl || INITIAL_LOGO_URL);
     const [bannerUrl, setBannerUrl] = useState<string>(savedState?.bannerUrl || INITIAL_BANNER_URL);
     const [juknisUrl, setJuknisUrl] = useState<string>(savedState?.juknisUrl || INITIAL_JUKNIS_URL);
-    const [offlineFormUrl, setOfflineFormUrl] = useState<string>(savedState?.offlineFormUrl || INITIAL_OFFLINE_FORM_URL);
     
-    // Settings
     const [adminPassword, setAdminPassword] = useState<string>(savedState?.adminPassword || INITIAL_ADMIN_PASSWORD);
     const [contactInfo, setContactInfo] = useState<ContactInfo>(savedState?.contactInfo || INITIAL_CONTACT_INFO);
     const [socialLinks, setSocialLinks] = useState<SocialLinks>(savedState?.socialLinks || INITIAL_SOCIAL_LINKS);
     
-    // Turso Config
     const [tursoConfig, setTursoConfig] = useState<TursoConfig>(savedState?.tursoConfig || INITIAL_TURSO_CONFIG);
     const [isSyncing, setIsSyncing] = useState(false);
 
-    // Persist to local storage whenever state changes
     useEffect(() => {
         try {
             const stateToSave = { 
                 events, juknisList, faqs, 
-                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, offlineFormUrl,
+                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl,
                 adminPassword, contactInfo, socialLinks, tursoConfig
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
         } catch (e) {
             console.error("Failed to save state", e);
         }
-    }, [events, juknisList, faqs, registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, offlineFormUrl, adminPassword, contactInfo, socialLinks, tursoConfig]);
+    }, [events, juknisList, faqs, registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, adminPassword, contactInfo, socialLinks, tursoConfig]);
 
-    // Attempt to load from Turso on mount if enabled
     useEffect(() => {
         const fetchRemoteData = async () => {
             if (tursoConfig.enabled && tursoConfig.dbUrl && tursoConfig.authToken) {
-                console.log("Attempting to load data from Turso...");
                 const remoteData = await tursoService.loadData(tursoConfig.dbUrl, tursoConfig.authToken);
                 if (remoteData) {
-                    console.log("Data loaded from Turso successfully.");
-                    // Update state with remote data
                     if (remoteData.events) setEvents(remoteData.events);
                     if (remoteData.juknisList) setJuknisList(remoteData.juknisList);
                     if (remoteData.faqs) setFaqs(remoteData.faqs);
@@ -198,34 +186,26 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     if (remoteData.logoUrl) setLogoUrl(remoteData.logoUrl);
                     if (remoteData.bannerUrl) setBannerUrl(remoteData.bannerUrl);
                     if (remoteData.juknisUrl) setJuknisUrl(remoteData.juknisUrl);
-                    if (remoteData.offlineFormUrl) setOfflineFormUrl(remoteData.offlineFormUrl);
                     if (remoteData.adminPassword) setAdminPassword(remoteData.adminPassword);
                     if (remoteData.contactInfo) setContactInfo(remoteData.contactInfo);
                     if (remoteData.socialLinks) setSocialLinks(remoteData.socialLinks);
                 }
             }
         };
-        
-        // Only run once on mount if config exists
         fetchRemoteData();
-    }, []); // Empty dependency array to run only on mount
+    }, []);
 
-    // Manual Sync function with optional override
     const syncToTurso = async (overrideData?: any): Promise<boolean> => {
-        // Use override config if provided (for example, before state updates), otherwise use current state
         const config = overrideData?.tursoConfig || tursoConfig;
-
-        if (!config.enabled || !config.dbUrl || !config.authToken) {
-            return false;
-        }
+        if (!config.enabled || !config.dbUrl || !config.authToken) return false;
 
         setIsSyncing(true);
         try {
             const currentState = { 
                 events, juknisList, faqs, 
-                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, offlineFormUrl,
+                registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl,
                 adminPassword, contactInfo, socialLinks, tursoConfig,
-                ...overrideData // Apply overrides
+                ...overrideData
             };
             await tursoService.saveData(config.dbUrl, config.authToken, JSON.stringify(currentState));
             setIsSyncing(false);
@@ -253,9 +233,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
-    // Reset Data Function
     const resetData = () => {
-        if (window.confirm("PERINGATAN: Apakah Anda yakin ingin mereset seluruh data sistem? Semua data konten dan password admin akan kembali ke default.")) {
+        if (window.confirm("PERINGATAN: Apakah Anda yakin ingin mereset seluruh data sistem?")) {
             localStorage.removeItem(STORAGE_KEY);
             setEvents(INITIAL_EVENTS);
             setJuknisList(INITIAL_JUKNIS);
@@ -266,7 +245,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setLogoUrl(INITIAL_LOGO_URL);
             setBannerUrl(INITIAL_BANNER_URL);
             setJuknisUrl(INITIAL_JUKNIS_URL);
-            setOfflineFormUrl(INITIAL_OFFLINE_FORM_URL);
             setAdminPassword(INITIAL_ADMIN_PASSWORD);
             setContactInfo(INITIAL_CONTACT_INFO);
             setSocialLinks(INITIAL_SOCIAL_LINKS);
@@ -275,61 +253,30 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
-    // Event Actions
-    const updateEvent = (updatedEvent: EventData) => {
-        setEvents(prev => prev.map(e => e.id === updatedEvent.id ? updatedEvent : e));
-    };
+    const updateEvent = (updatedEvent: EventData) => setEvents(prev => prev.map(e => e.id === updatedEvent.id ? updatedEvent : e));
+    const addEvent = (newEvent: EventData) => setEvents(prev => [...prev, newEvent]);
+    const deleteEvent = (id: string) => setEvents(prev => prev.filter(e => e.id !== id));
 
-    const addEvent = (newEvent: EventData) => {
-        setEvents(prev => [...prev, newEvent]);
-    };
+    const updateJuknis = (updatedJuknis: JuknisItem) => setJuknisList(prev => prev.map(j => j.id === updatedJuknis.id ? updatedJuknis : j));
+    const addJuknis = (newJuknis: JuknisItem) => setJuknisList(prev => [...prev, newJuknis]);
+    const deleteJuknis = (id: string) => setJuknisList(prev => prev.filter(j => j.id !== id));
 
-    const deleteEvent = (id: string) => {
-        setEvents(prev => prev.filter(e => e.id !== id));
-    };
+    const updateFaq = (updatedFaq: FaqItem) => setFaqs(prev => prev.map(f => f.id === updatedFaq.id ? updatedFaq : f));
+    const addFaq = (newFaq: FaqItem) => setFaqs(prev => [...prev, newFaq]);
+    const deleteFaq = (id: string) => setFaqs(prev => prev.filter(f => f.id !== id));
 
-    // Juknis Actions
-    const updateJuknis = (updatedJuknis: JuknisItem) => {
-        setJuknisList(prev => prev.map(j => j.id === updatedJuknis.id ? updatedJuknis : j));
-    };
-
-    const addJuknis = (newJuknis: JuknisItem) => {
-        setJuknisList(prev => [...prev, newJuknis]);
-    };
-
-    const deleteJuknis = (id: string) => {
-        setJuknisList(prev => prev.filter(j => j.id !== id));
-    };
-
-    // FAQ Actions
-    const updateFaq = (updatedFaq: FaqItem) => {
-        setFaqs(prev => prev.map(f => f.id === updatedFaq.id ? updatedFaq : f));
-    };
-
-    const addFaq = (newFaq: FaqItem) => {
-        setFaqs(prev => [...prev, newFaq]);
-    };
-
-    const deleteFaq = (id: string) => {
-        setFaqs(prev => prev.filter(f => f.id !== id));
-    };
-
-    // URL Actions
     const updateRegistrationUrl = (url: string) => setRegistrationUrl(url);
     const updatePublicParticipantsUrl = (url: string) => setPublicParticipantsUrl(url);
     const updateBrochureUrl = (url: string) => setBrochureUrl(url);
     const updateLogoUrl = (url: string) => setLogoUrl(url);
     const updateBannerUrl = (url: string) => setBannerUrl(url);
     const updateJuknisUrl = (url: string) => setJuknisUrl(url);
-    const updateOfflineFormUrl = (url: string) => setOfflineFormUrl(url);
     
-    // Settings Actions
     const updateAdminPassword = (password: string) => setAdminPassword(password);
     const updateContactInfo = (info: ContactInfo) => setContactInfo(info);
     const updateSocialLinks = (links: SocialLinks) => setSocialLinks(links);
     const updateTursoConfig = (config: TursoConfig) => setTursoConfig(config);
 
-    // Mock Registration
     const registerParticipant = (data: RegistrationFormData) => {
         console.log("Registered Participant:", data);
     };
@@ -337,21 +284,14 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return (
         <DataContext.Provider value={{ 
             events, juknisList, faqs,
-            registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl, offlineFormUrl,
+            registrationUrl, publicParticipantsUrl, brochureUrl, logoUrl, bannerUrl, juknisUrl,
             adminPassword, contactInfo, socialLinks, tursoConfig,
-            
             updateEvent, addEvent, deleteEvent,
             updateJuknis, addJuknis, deleteJuknis,
             updateFaq, addFaq, deleteFaq,
-            updateRegistrationUrl, updatePublicParticipantsUrl, updateBrochureUrl, updateLogoUrl, updateBannerUrl, updateJuknisUrl, updateOfflineFormUrl,
+            updateRegistrationUrl, updatePublicParticipantsUrl, updateBrochureUrl, updateLogoUrl, updateBannerUrl, updateJuknisUrl,
             updateAdminPassword, updateContactInfo, updateSocialLinks, updateTursoConfig,
-            
-            registerParticipant,
-            resetData,
-            syncToTurso,
-            testTursoConnection,
-            initializeTurso,
-            isSyncing
+            registerParticipant, resetData, syncToTurso, testTursoConnection, initializeTurso, isSyncing
         }}>
             {children}
         </DataContext.Provider>
@@ -360,8 +300,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 export const useData = () => {
     const context = useContext(DataContext);
-    if (context === undefined) {
-        throw new Error('useData must be used within a DataProvider');
-    }
+    if (context === undefined) throw new Error('useData must be used within a DataProvider');
     return context;
 };

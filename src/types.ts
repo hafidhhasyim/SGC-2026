@@ -71,7 +71,6 @@ export interface DataContextType {
     logoUrl: string;
     bannerUrl: string;
     juknisUrl: string;
-    offlineFormUrl: string; // New: Link khusus formulir offline
 
     // Settings
     adminPassword: string;
@@ -98,7 +97,6 @@ export interface DataContextType {
     updateLogoUrl: (url: string) => void;
     updateBannerUrl: (url: string) => void;
     updateJuknisUrl: (url: string) => void;
-    updateOfflineFormUrl: (url: string) => void; // New action
     
     updateAdminPassword: (password: string) => void;
     updateContactInfo: (info: ContactInfo) => void;
