@@ -166,7 +166,7 @@ const JuknisPage: React.FC = () => {
                     <div className="animate-fade-in space-y-8">
                          <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3">
                             <span className="bg-green-100 text-green-600 p-2 rounded-lg"><CheckCircle /></span>
-                            Try Out Simulasi SGC 2026
+                            Try Out Simulasi SGC 2027
                         </h2>
                         <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
                             <p className="text-slate-700 leading-relaxed">
