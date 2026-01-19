@@ -103,7 +103,7 @@ const JuknisPage: React.FC = () => {
         </div>
 
         {/* Detailed Info Tabs */}
-        <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 mb-16">
+        {/* <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 mb-16">
             <div className="bg-slate-900 p-1 flex justify-center overflow-x-auto">
                 <button 
                     onClick={() => setActiveTab('akademik')}
@@ -176,7 +176,7 @@ const JuknisPage: React.FC = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </div> */}
 
         {/* Important Notes */}
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-8">
